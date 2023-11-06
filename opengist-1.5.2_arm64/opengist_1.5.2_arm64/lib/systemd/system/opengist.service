@@ -1,0 +1,19 @@
+[Unit]
+Description=Opengist - Host your own Gist
+Documentation=man:opengist(1)
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+User=opengist
+ExecStart=opengist --config=/etc/opengist/config.yml
+Restart=on-failure
+Restart=always
+RestartSec=2s
+TimeoutStopSec=20
+SuccessExitStatus=3 4
+RestartForceExitStatus=3 4
+
+[Install]
+WantedBy=multi-user.target
