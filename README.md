@@ -41,6 +41,10 @@ Once OpenGist is installed, the following files will be placed in the below stru
 
 <br />
 
+This deb will create a new system user named `opengist` which will run the service.
+
+<br />
+
 ---
 
 <br />
