@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/Aetherinox/debian-opengist/88ceb55da2457ade600394a1922005efc4b36fc9/Docs/images/banner.jpg" width="860"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/Aetherinox/debian-opengist/main/Docs/images/banner.jpg" width="860"></p>
 <h1 align="center"><b>Opengist (Debian Package)</b></h1>
 
 <div align="center">
@@ -263,4 +263,4 @@ File structure / tree for `opengist_1.6.1_arm64`
 
 # Previews
 
-<p align="center"><img style="width: 85%;text-align: center;border: 1px solid #353535;" src="https://raw.githubusercontent.com/Aetherinox/debian-opengist/main/Docs/images/banner.jpg"></p>
+<p align="center"><img style="width: 85%;text-align: center;border: 1px solid #353535;" src="https://raw.githubusercontent.com/Aetherinox/debian-opengist/main/Docs/images/1.png"></p>
