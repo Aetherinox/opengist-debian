@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Opengist
+GenericName=Opengist
+Version=1.5.2
+Comment=Start Opengist server
+Type=Application
+Icon=opengist
+Categories=Utility;
+Exec=opengist --config "/etc/opengist/config.yml"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
