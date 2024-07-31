@@ -94,7 +94,7 @@ sudo apt install opengist
 
 ## Manually
 
-Download the latest `.deb` package from this repo's [Releases](/releases) page. Once you have downloaded the `.deb` file, install it using:
+Download the latest `.deb` package from this repo's [Releases](https://github.com/Aetherinox/debian-opengist/releases) page. Once you have downloaded the `.deb` file, install it using:
 
 ```shell ignore
 sudo dpkg -i opengist_1.7.3_amd64.deb
