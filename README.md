@@ -106,8 +106,8 @@ The system service will activate the binary in `/usr/bin/opengist`
 To build the debian package
 
 ```shell
-dpkg-deb --root-owner-group --build opengist-1.6.1_amd64
-dpkg-deb --root-owner-group --build opengist-1.6.1_arm64
+dpkg-deb --root-owner-group --build opengist-1.7.3_amd64
+dpkg-deb --root-owner-group --build opengist-1.7.3_arm64
 ```
 
 <br />
@@ -115,8 +115,8 @@ dpkg-deb --root-owner-group --build opengist-1.6.1_arm64
 Run the linter
 
 ```shell
-lintian opengist_1.6.1_amd64.deb --tag-display-limit 0 | grep executable-not-elf
-lintian opengist_1.6.1_arm64.deb --tag-display-limit 0 | grep executable-not-elf
+lintian opengist_1.7.3_amd64.deb --tag-display-limit 0 | grep executable-not-elf
+lintian opengist_1.7.3_arm64.deb --tag-display-limit 0 | grep executable-not-elf
 ```
 
 <br />
@@ -130,12 +130,12 @@ This debian package uses the following structure:
 
 <br />
 
-## opengist_1.6.1_amd64
-File structure / tree for `opengist_1.6.1_amd64`
+## opengist_1.7.3_amd64
+File structure / tree for `opengist_1.7.3_amd64`
 
 ```console ignore
 .
-├── opengist_1.6.1_amd64
+├── opengist_1.7.3_amd64
 │   ├── DEBIAN
 │   │   ├── conffiles
 │   │   ├── control
@@ -185,7 +185,7 @@ File structure / tree for `opengist_1.6.1_amd64`
 │           └── man
 │               └── man1
 │                   └── opengist.1.gz
-└── opengist_1.6.1_amd64.deb
+└── opengist_1.7.3_amd64.deb
 
 30 directories, 21 files
 ```
@@ -196,11 +196,11 @@ File structure / tree for `opengist_1.6.1_amd64`
 
 <br />
 
-## opengist_1.6.1_arm64
-File structure / tree for `opengist_1.6.1_arm64`
+## opengist_1.7.3_arm64
+File structure / tree for `opengist_1.7.3_arm64`
 
 ```console ignore
-├── opengist_1.6.1_arm64
+├── opengist_1.7.3_arm64
 │   ├── DEBIAN
 │   │   ├── conffiles
 │   │   ├── control
@@ -250,7 +250,7 @@ File structure / tree for `opengist_1.6.1_arm64`
 │           └── man
 │               └── man1
 │                   └── opengist.1.gz
-└── opengist_1.6.1_arm64.deb
+└── opengist_1.7.3_arm64.deb
 
 30 directories, 21 files
 ```
