@@ -30,8 +30,7 @@ Opengist is a self-hosted pastebin powered by Git. All snippets are stored in a 
 
 # Install
 
-Install this Debian package as you would any other by downloading and executing it.
-Once OpenGist is installed, the following files will be placed in the below structure:
+After instaling this package; the following files will be placed in the below structure:
 
 ```
 📁 /etc/opengist/config.yml
@@ -41,7 +40,65 @@ Once OpenGist is installed, the following files will be placed in the below stru
 
 <br />
 
-This deb will create a new system user named `opengist` which will run the service.
+This .deb will create a new system user named `opengist` which will run the opengist service.
+
+<br />
+
+To install Opengist, you have two options -- pick only one:
+1. [Proteus Apt Repo](#proteus-apt-repo)
+2. [Manually](#manually)
+
+<br />
+
+## Proteus Apt Repo
+The Proteus Apt Repo is a special Ubuntu / Debian / CentOS repository hosted by this developer on Github. You can install this Opengist package using `apt-get install` by adding the proteus apt repo to your sources list.
+
+<br />
+
+
+Open `Terminal` and add the GPG key to your keyring
+```bash
+wget -qO - https://github.com/Aetherinox.gpg | sudo gpg --dearmor -o /usr/share/keyrings/aetherinox-proteus-archive.gpg
+```
+
+<br />
+
+Fetch the repo package list:
+```shell
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/aetherinox-proteus-archive.gpg] https://raw.githubusercontent.com/Aetherinox/proteus-apt-repo/master $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/aetherinox-proteus-archive.list
+```
+
+<br />
+
+(Optional): To test if the correct GPG key was added:
+```shell
+gpg -n -q --import --import-options import-show /usr/share/keyrings/aetherinox-proteus-archive.gpg | awk '/pub/{getline; gsub(/^ +| +$/,""); if($0 == "BCA07641EE3FCD7BC5585281488D518ABD3DC629") print "\nGPG fingerprint matches ("$0").\n"; else print "\GPG verification failed: Fngerprint ("$0") does not match the expected one.\n"}'
+```
+
+<br />
+
+Finally, run in terminal
+```shell
+sudo apt update
+```
+
+<br />
+
+Once the above steps are complete, you can install the Opengist package by executing:
+```shell ignore
+sudo apt install opengist
+```
+
+
+<br />
+
+## Manually
+
+Download the latest `.deb` package from this repo's [Releases](releases) page. Once you have downloaded the `.deb` file, install it using:
+
+```shell ignore
+sudo dpkg -i opengist_1.7.3_amd64.deb
+```
 
 <br />
 
