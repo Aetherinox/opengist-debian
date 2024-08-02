@@ -385,7 +385,7 @@ lst_arch=(
             # #
 
             cp build/opengist-${arch}/opengist/config.yml src/$PKG_FOLDER/etc/opengist/config.yml >> /dev/null 2>&1
-            cp build/opengist-${arch}/opengist/config.yml src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yml >> /dev/null 2>&1
+            cp build/opengist-${arch}/opengist/config.yml src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml >> /dev/null 2>&1
 
             # #
             #    open 'DEBIAN/control' and change version number
