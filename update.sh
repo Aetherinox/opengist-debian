@@ -451,4 +451,4 @@ END_ED
             echo -e
 
             rm -rf "build" >> /dev/null 2>&1
-        donen
+        done
