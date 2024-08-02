@@ -57,13 +57,13 @@ jobs:
             - name: "👁️‍🗨️ Run Script"
               id: task_initialize_bash_run
               run: |
+                npm install tree
                 command="update.sh"
                 input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
                 if [ "${input_EDIT_CHANGELOG}" = true ]; then
                   command+=" -s"
                 fi
-                
+
                 # make file runnable, might not be necessary
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
-                echo -e ${command}
                 eval "./$command"
