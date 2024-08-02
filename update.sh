@@ -11,6 +11,12 @@ echo
 #   tput setf   [1-7]       : Set a foreground color
 # #
 
+case "$TERM" in
+    'xterm') TERM=xterm-256color;;
+    'urxvt') TERM=rxvt-unicode-256color;;
+    'Eterm') TERM=Eterm-256color;;
+esac
+
 BLACK=$(tput setaf 0)
 RED=$(tput setaf 1)
 ORANGE=$(tput setaf 208)
@@ -192,6 +198,7 @@ if ! [ -x "$(command -v lastversion)" ]; then
     # #
 
     pip install lastversion --break-system-packages
+    cp ${HOME}/.local/bin/lastversion ${HOME}/bin/
     sudo touch /etc/profile.d/lastversion.sh
 
     envpath_add_lastversion '${HOME}/bin'
