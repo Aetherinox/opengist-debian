@@ -1,9 +1,9 @@
-<p align="center"><img src="https://raw.githubusercontent.com/Aetherinox/debian-opengist/main/Docs/images/banner.jpg" width="860"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/Aetherinox/opengist-debian/main/Docs/images/banner.jpg" width="860"></p>
 <h1 align="center"><b>Opengist (Debian Package)</b></h1>
 
 <div align="center">
 
-![Version](https://img.shields.io/github/v/tag/Aetherinox/debian-opengist?logo=GitHub&label=version&color=ba5225) ![Downloads](https://img.shields.io/github/downloads/Aetherinox/debian-opengist/total) ![Repo Size](https://img.shields.io/github/repo-size/Aetherinox/debian-opengist?label=size&color=59702a) ![Last Commit)](https://img.shields.io/github/last-commit/Aetherinox/debian-opengist?color=b43bcc)
+![Version](https://img.shields.io/github/v/tag/Aetherinox/opengist-debian?logo=GitHub&label=version&color=ba5225) ![Downloads](https://img.shields.io/github/downloads/Aetherinox/opengist-debian/total) ![Repo Size](https://img.shields.io/github/repo-size/Aetherinox/opengist-debian?label=size&color=59702a) ![Last Commit)](https://img.shields.io/github/last-commit/Aetherinox/opengist-debian?color=b43bcc)
 
 </div>
 
@@ -94,7 +94,7 @@ sudo apt install opengist
 
 ## Manually
 
-Download the latest `.deb` package from this repo's [Releases](https://github.com/Aetherinox/debian-opengist/releases) page. Once you have downloaded the `.deb` file, install it using:
+Download the latest `.deb` package from this repo's [Releases](https://github.com/Aetherinox/opengist-debian/releases) page. Once you have downloaded the `.deb` file, install it using:
 
 ```shell ignore
 sudo dpkg -i opengist_1.7.3_amd64.deb
@@ -320,4 +320,4 @@ File structure / tree for `opengist_1.7.3_arm64`
 
 # Previews
 
-<p align="center"><img style="width: 85%;text-align: center;border: 1px solid #353535;" src="https://raw.githubusercontent.com/Aetherinox/debian-opengist/main/Docs/images/1.png"></p>
+<p align="center"><img style="width: 85%;text-align: center;border: 1px solid #353535;" src="https://raw.githubusercontent.com/Aetherinox/opengist-debian/main/Docs/images/1.png"></p>

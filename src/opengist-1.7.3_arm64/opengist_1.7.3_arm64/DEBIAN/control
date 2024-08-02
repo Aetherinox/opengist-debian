@@ -5,7 +5,7 @@ Priority: optional
 Architecture: arm64
 Maintainer: Thomas Miceli <thomiceli@github.com>
 Depends: adduser
-Homepage: https://github.com/Aetherinox/debian-opengist
+Homepage: https://github.com/Aetherinox/opengist-debian
 Description: Self-hosted pastebin powered by Git, open-source alternative to Github
  Gist. Opengist is a self-hosted pastebin powered by Git. All snippets are
  stored in a Git repository and can be read and/or modified using standard Git
