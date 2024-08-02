@@ -10,7 +10,9 @@ echo
 #   tput setaf  [1-7]       : Set a foreground color using ANSI escape
 #   tput setf   [1-7]       : Set a foreground color
 # #
-
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
 BLACK=$(tput setaf 0)
 RED=$(tput setaf 1)
 ORANGE=$(tput setaf 208)
