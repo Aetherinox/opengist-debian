@@ -192,8 +192,10 @@ if ! [ -x "$(command -v lastversion)" ]; then
     # #
 
     pip install lastversion --break-system-packages
-    cp ${HOME}/.local/bin/lastversion ${HOME}/bin/
+    #cp ${HOME}/.local/bin/lastversion ${HOME}/bin/
     sudo touch /etc/profile.d/lastversion.sh
+
+    envpath_add_lastversion '${HOME}/bin'
 
     echo 'export PATH="${HOME}/bin:$PATH"' | sudo tee /etc/profile.d/lastversion.sh
 
