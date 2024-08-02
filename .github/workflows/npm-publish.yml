@@ -15,7 +15,7 @@ on:
       EDIT_CHANGELOG:
         description:  "🗂️ Dont Edit Changelog"
         required:     true
-        default:      false
+        default:      true
         type:         boolean
 
 jobs:
