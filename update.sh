@@ -397,7 +397,7 @@ lst_arch=(
             #    open 'usr/share/applications/opengist.desktop' and change version number
             # #
 
-            sed -Ei "s/(Version=).*/\1 ${PKG_VER}/" src/$PKG_FOLDER/usr/share/applications/opengist.desktop >> /dev/null 2>&1
+            sed -Ei "s/(Version=).*/\1${PKG_VER}/" src/$PKG_FOLDER/usr/share/applications/opengist.desktop >> /dev/null 2>&1
 
             # #
             #    Skip changelog
@@ -451,4 +451,4 @@ END_ED
             echo -e
 
             rm -rf "build" >> /dev/null 2>&1
-        done
+        donen
