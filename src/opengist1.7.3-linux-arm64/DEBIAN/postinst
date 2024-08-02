@@ -4,8 +4,8 @@ set -e
 ##--------------------------------------------------------------------------
 #   @author :           aetherinox
 #   @script :           Opengist .deb Package
-#   @when   :           2024-07-31 02:14:53
-#   @url    :           https://github.com/Aetherinox/debian-opengist
+#   @when   :           2024-08-02 02:14:53
+#   @url    :           https://github.com/Aetherinox/opengist-debian
 #
 #   There are better ways to do some of this, but unfortunately since we're
 #   not the developer, nor do we have the luxury of adding variables or

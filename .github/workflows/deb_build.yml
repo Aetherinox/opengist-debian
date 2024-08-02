@@ -1,5 +1,5 @@
-name: "📦 Build from Source"
-run-name: "📦 Build from Source"
+name: "📦 .deb › Build"
+run-name: "📦 .deb › Build"
 
 on:
   workflow_dispatch:
@@ -24,9 +24,9 @@ jobs:
     #   JOB > INITIALIZE
     # ---------------------------------------------------------------------------------------
 
-    job-initialize:
+    job-build:
         name: >-
-          📦 Publish › Initialize
+          📦 Build › Initialize
         runs-on: ubuntu-latest
         permissions:
             contents: write
@@ -34,7 +34,7 @@ jobs:
         steps:
 
             - name: "✅ Start"
-              id: task_initialize_start
+              id: task_build_start
               run: |
                 echo "Starting build"
 
@@ -43,7 +43,7 @@ jobs:
             # ---------------------------------------------------------------------------------------
 
             - name: "☑️ Checkout"
-              id: task_initialize_checkout
+              id: task_build_checkout
               uses: actions/checkout@v4
               with:
                 fetch-depth: 0
@@ -52,8 +52,8 @@ jobs:
             #   Get version from package.json VERSION value
             # ---------------------------------------------------------------------------------------
 
-            - name: "👁️‍🗨️ Run Script"
-              id: task_initialize_bash_run
+            - name: "🔨 Build .deb"
+              id: task_build_run
               run: |
                 sudo apt install tree
                 command="update.sh"
@@ -68,5 +68,7 @@ jobs:
 
                 tree
 
-            - name: "👁️‍🗨️ Commit"
+            - name: "📦 Commit"
+              id: task_build_commit
               uses: stefanzweifel/git-auto-commit-action@v5
+
