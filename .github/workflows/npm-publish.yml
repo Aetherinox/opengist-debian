@@ -6,62 +6,17 @@ on:
     inputs:
 
       # ---------------------------------------------------------------------------------------
-      #   Name of the plugin to use when creating the release zip filename
-      #     e.g: marked-alert-fa-v1.0.0.zip
-      # ---------------------------------------------------------------------------------------
-
-      PLUGIN_NAME:
-        description:  "📦 Name of Plugin"
-        required:     true
-        default:      'marked-alert-fa'
-        type:         string
-
-      # ---------------------------------------------------------------------------------------
-      #   ENABLE:   the changelog generated in releases tab will only display single commits.
-      #   DISABLE:  the changelog shows pull requests completed based on their labels
-      # ---------------------------------------------------------------------------------------
-
-      CHANGELOG_MODE_COMMIT:
-        description:  "📑 Use Commits Instead of PRs"
-        required:     true
-        default:      true
-        type:         boolean
-
-      # ---------------------------------------------------------------------------------------
       #   ENABLE:   Will show all types of commits, including uncategorized
       #   DISABLE:  WIll only show actions that have been categorized using the format
       #                type(scope): description
       #                type: description
       # ---------------------------------------------------------------------------------------
 
-      SHOW_UNCATEGORIZED:
-        description:  "🗂️ Show Uncategorized Commits"
+      EDIT_CHANGELOG:
+        description:  "🗂️ Dont Edit Changelog"
         required:     true
         default:      false
         type:         boolean
-
-      # ---------------------------------------------------------------------------------------
-      #   ENABLE:   released version will be marked as pre-release
-      #   DISABLE:  release version will be marked as stable / normal release
-      # ---------------------------------------------------------------------------------------
-
-      PRERELEASE:
-        description:  "🧪 Build RC (Pre-release)"
-        required:     true
-        default:      false
-        type:         boolean
-
-      # ---------------------------------------------------------------------------------------
-      #   Release Candidate version number
-      #   this will be added to the end of your released app in the releases page.
-      #     e.g: marked-alert-fa-v1.0.0-rc.1
-      # ---------------------------------------------------------------------------------------
-
-      VERSION_RC:
-        description:  "🧪 RC (Pre-release) Ver (marked-alert-fa-rc.v1)"
-        required:     false
-        type:         string
-        default:      "1"
 
 jobs:
 
@@ -102,6 +57,13 @@ jobs:
             - name: "👁️‍🗨️ Run Script"
               id: task_initialize_bash_run
               run: |
+                command = "${GITHUB_WORKSPACE}/update.sh"
+                input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
+                if [ "${input_EDIT_CHANGELOG}" = true ]; then
+                  command+=" -s"
+                fi
+                
                 # make file runnable, might not be necessary
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
-                "${GITHUB_WORKSPACE}//update.sh"
+                
+                eval "$command"
