@@ -57,7 +57,7 @@ jobs:
             - name: "👁️‍🗨️ Run Script"
               id: task_initialize_bash_run
               run: |
-                apt install tree
+                sudo apt install tree
                 command="update.sh"
                 input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
                 if [ "${input_EDIT_CHANGELOG}" = true ]; then
