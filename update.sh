@@ -192,7 +192,7 @@ if ! [ -x "$(command -v lastversion)" ]; then
     # #
 
     pip install lastversion --break-system-packages
-    #cp ${HOME}/.local/bin/lastversion ${HOME}/bin/
+    cp ${HOME}/.local/bin/lastversion ${{ github.workspace }}/bin/
     sudo touch /etc/profile.d/lastversion.sh
 
     envpath_add_lastversion '${HOME}/bin'
