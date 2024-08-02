@@ -28,8 +28,6 @@ jobs:
         name: >-
           📦 Publish › Initialize
         runs-on: ubuntu-latest
-        outputs:
-          package_version: ${{ steps.task_initialize_package_getversion.outputs.PACKAGE_VERSION }}
         permissions:
             contents: write
             packages: write
@@ -69,3 +67,6 @@ jobs:
                 eval "./$command"
 
                 tree
+
+            - name: "👁️‍🗨️ Commit"
+              uses: stefanzweifel/git-auto-commit-action@v5
