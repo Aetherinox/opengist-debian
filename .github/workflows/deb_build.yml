@@ -273,7 +273,7 @@ jobs:
                 # #
 
                 input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
-                if [ "${input_EDIT_CHANGELOG}" = true ]; then
+                if [ "${input_EDIT_CHANGELOG}" == "true" ]; then
                   command+=" --skipChangelog"
                 fi
 
@@ -282,7 +282,7 @@ jobs:
                 #   appends -f, --force to the command
                 # #
 
-                if [ "${{ inputs.FLAG_FORCE }}" = true ]; then
+                if [ "${{ inputs.FLAG_FORCE }}" == "true" ]; then
                   command+=" --force"
                 fi
 
