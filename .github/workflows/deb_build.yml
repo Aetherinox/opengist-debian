@@ -160,27 +160,48 @@ jobs:
                   
                 # here we can place the command that will generate multi-line text
                 # echo $MULTI_LINES_TEXT >> $GITHUB_ENV 
-                echo "BUILD_OUTPUT=$(eval ./$command)" >> "$GITHUB_ENV"
+                echo "_OUTPUT=$(eval ./$command)" >> "$GITHUB_ENV"
                   
                 echo "EOF" >> $GITHUB_ENV
 
             - name: "Version"
               shell: bash
               run: |
-                echo "${{ env.BUILD_OUTPUT }}" | tail -n1
-
+                build_output="echo ${{ env._OUTPUT }}" | tail -n1
+                echo "BUILD_OUTPUT=$(build_output)" >> "$GITHUB_ENV"
+                
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
             # ---------------------------------------------------------------------------------------
 
             - name: >-
-                📋 Upload Artifacts › opengist-linux-386
-              id: task_build_amd64
+                📋 Upload Artifacts › opengist${{ env.BUILD_OUTPUT }}-linux-386
+              id: task_build_artifact_i386
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: "opengist-linux-386"
-                path: src/*.deb
+                name: "opengist${{ env.BUILD_OUTPUT }}-linux-386.deb"
+                path: src/opengist${{ env.BUILD_OUTPUT }}-linux-386*
+                retention-days: 30
+
+            - name: >-
+                📋 Upload Artifacts › opengist${{ env.BUILD_OUTPUT }}-linux-amd64
+              id: task_build_artifact_amd64
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                name: "opengist${{ env.BUILD_OUTPUT }}-linux-amd64.deb"
+                path: src/opengist${{ env.BUILD_OUTPUT }}-linux-amd64*
+                retention-days: 30
+
+            - name: >-
+                📋 Upload Artifacts › opengist${{ env.BUILD_OUTPUT }}-linux-arm64
+              id: task_build_artifact_arm64
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                name: "opengist${{ env.BUILD_OUTPUT }}-linux-arm64.deb"
+                path: src/opengist${{ env.BUILD_OUTPUT }}-linux-arm64*
                 retention-days: 30
 
             # ---------------------------------------------------------------------------------------
