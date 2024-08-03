@@ -149,16 +149,22 @@ jobs:
                 #   permissions
                 # #
 
-                # make file runnable, might not be necessary
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
 
-                echo -e "Sending command: ${command}"
-                # echo "EXECUTION_OUTPUT=$(eval ./$command)" >> "$GITHUB_ENV"
-                # eval "./$command"
+                # #
+                #   save output of bash script to env var
+                # #
 
+                echo -e "Sending command: ${command}"
                 echo "VERSION_TEXT<<EOF" >> $GITHUB_ENV
                 echo "VERSION_PACKAGE=$(eval ./$command | tail -n1)" >> "$GITHUB_ENV"
                 echo "EOF" >> $GITHUB_ENV
+
+                # #
+                #   old run command
+                # #
+
+                # eval "./$command"
 
             # ---------------------------------------------------------------------------------------
             #   Debug > Show Version
@@ -167,40 +173,42 @@ jobs:
             - name: "Version: Package"
               shell: bash
               run: |
+                echo -e "${{ env.VERSION_TEXT }}"
                 echo -e "${{ env.VERSION_PACKAGE }}"
+                echo -e "${{ steps.task_build_run.outputs.VERSION_PACKAGE }}"
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
             # ---------------------------------------------------------------------------------------
 
             - name: >-
-                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-386
+                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-386.deb
               id: task_build_artifact_i386
               uses: actions/upload-artifact@v4
               if: always()
               with:
                 name: "opengist${{ env.VERSION_PACKAGE }}-linux-386.deb"
-                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-386*
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-386*.deb
                 retention-days: 30
 
             - name: >-
-                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-amd64
+                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-amd64.deb
               id: task_build_artifact_amd64
               uses: actions/upload-artifact@v4
               if: always()
               with:
                 name: "opengist${{ env.VERSION_PACKAGE }}-linux-amd64.deb"
-                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-amd64*
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-amd64*.deb
                 retention-days: 30
 
             - name: >-
-                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-arm64
+                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-arm64.deb
               id: task_build_artifact_arm64
               uses: actions/upload-artifact@v4
               if: always()
               with:
                 name: "opengist${{ env.VERSION_PACKAGE }}-linux-arm64.deb"
-                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-arm64*
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-arm64*.deb
                 retention-days: 30
 
             # ---------------------------------------------------------------------------------------
