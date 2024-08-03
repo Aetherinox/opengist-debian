@@ -430,9 +430,10 @@ lst_arch=(
                     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
                     echo -e
 
-                    rm *.tar.gz* >> /dev/null 2>&1
-
-                    exit 1
+                    if [ "${OPT_FORCE}" != "true" ]; then
+                        rm *.tar.gz* >> /dev/null 2>&1
+                        exit 1
+                    fi
                 fi
 
                 # #
@@ -452,9 +453,10 @@ lst_arch=(
                     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
                     echo -e
 
-                    rm *.tar.gz* >> /dev/null 2>&1
-
-                    exit 1
+                    if [ "${OPT_FORCE}" != "true" ]; then
+                        rm *.tar.gz* >> /dev/null 2>&1
+                        exit 1
+                    fi
                 fi
 
                 # #
@@ -477,9 +479,10 @@ lst_arch=(
                     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
                     echo -e
 
-                    rm *.tar.gz* >> /dev/null 2>&1
-
-                    exit 1
+                    if [ "${OPT_FORCE}" != "true" ]; then
+                        rm *.tar.gz* >> /dev/null 2>&1
+                        exit 1
+                    fi
                 fi
             fi
 
