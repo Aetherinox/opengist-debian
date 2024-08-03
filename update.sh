@@ -36,6 +36,15 @@ STRIKE="\e[9m"
 END="\e[0m"
 
 # #
+#   DEFINE > Default Arguments
+# #
+
+OPT_DEV_ENABLE="false"
+OPT_FORCE="false"
+OPT_PRECHECK="false"
+OPT_SKIP_CHANGELOG="false"
+
+# #
 #   DEFINE > Globals
 # #
 
@@ -245,20 +254,20 @@ opt_usage()
 while [ $# -gt 0 ]; do
   case "$1" in
     -d|--dev)
-            OPT_DEV_ENABLE=true
+            OPT_DEV_ENABLE="true"
             echo -e "  ${FUCHSIA}${BLINK}Devmode Enabled${NORMAL}"
             ;;
 
     -f*|--force*)
-            OPT_FORCE=true
+            OPT_FORCE="true"
             ;;
 
     -p*|--precheck*)
-            OPT_PRECHECK=true
+            OPT_PRECHECK="true"
             ;;
 
     -s*|--skipChangelog*)
-            OPT_SKIP_CHANGELOG=true
+            OPT_SKIP_CHANGELOG="true"
             ;;
 
     -h*|--help*)
@@ -523,7 +532,7 @@ lst_arch=(
             #   Skip changelog
             # #
 
-            if [ -z "${OPT_SKIP_CHANGELOG}" ] || [ "${OPT_SKIP_CHANGELOG}" = false ]; then
+            if [ -z "${OPT_SKIP_CHANGELOG}" ] || [ "${OPT_SKIP_CHANGELOG}" == "false" ]; then
 
                 # #
                 #   changelog
