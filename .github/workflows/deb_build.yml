@@ -170,11 +170,20 @@ jobs:
             #   Debug > Show Version
             # ---------------------------------------------------------------------------------------
 
-            - name: "Version: Package"
+            - name: "Debug: Package Version"
               shell: bash
               run: |
                 echo -e "${{ env.VERSION_PACKAGE }}"
                 echo -e "${{ steps.task_build_run.outputs.VERSION_PACKAGE }}"
+
+            # ---------------------------------------------------------------------------------------
+            #   Debug > Tree
+            # ---------------------------------------------------------------------------------------
+
+            - name: "Debug: Tree"
+              shell: bash
+              run: |
+                tree
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
