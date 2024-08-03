@@ -157,7 +157,7 @@ jobs:
 
                 echo -e "Sending command: ${command}"
                 echo "VERSION_TEXT<<EOF" >> $GITHUB_ENV
-                echo "VERSION_PACKAGE=$(eval ./$command | tail -n1)" >> "$GITHUB_ENV"
+                echo "$(eval ./$command | tail -n1)" >> "$GITHUB_ENV"
                 echo "EOF" >> $GITHUB_ENV
 
                 # #
