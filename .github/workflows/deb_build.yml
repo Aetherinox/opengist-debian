@@ -153,7 +153,7 @@ jobs:
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
 
                 echo -e "Sending command: ${command}"
-                echo "EXECUTION_OUTPUT=$(eval ./$command)" >> "$GITHUB_ENV"
+                eval "./$command"
 
                 tree
 
