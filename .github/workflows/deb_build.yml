@@ -6,10 +6,9 @@ on:
     inputs:
 
       # ---------------------------------------------------------------------------------------
-      #   ENABLE:   Will show all types of commits, including uncategorized
-      #   DISABLE:  WIll only show actions that have been categorized using the format
-      #                type(scope): description
-      #                type: description
+      #   ENABLE:   Anything in the bash script's CHANGELOG variable will be appended to
+      #             the top of the debian package's changelog file.
+      #   DISABLE:  debian package changelog will not be edited.
       # ---------------------------------------------------------------------------------------
 
       EDIT_CHANGELOG:
@@ -37,7 +36,7 @@ jobs:
 
     job-build:
         name: >-
-          📦 Build › Initialize
+          📦 Build › Package
         runs-on: ubuntu-latest
         permissions:
             contents: write
@@ -67,7 +66,7 @@ jobs:
             #   Job > Get Previous Tag
             # ---------------------------------------------------------------------------------------
 
-            - name: "Get Previous tag"
+            - name: "🏷️ Get Previous tag"
               id: previoustag
               uses: "WyriHaximus/github-action-get-previous-tag@v1"
               with:
@@ -109,6 +108,8 @@ jobs:
             - name: "🔨 Build › Precheck"
               id: task_build_precheck
               run: |
+
+                echo -e "Starting Precheck for new Opengist updates"
 
                 # #
                 #   base command
@@ -167,6 +168,8 @@ jobs:
               id: task_build_run
               if: steps.task_build_precheck.outcome == 'success'
               run: |
+
+                echo -e "Precheck successful, downloading update for Opengist"
 
                 # #
                 #   base command
@@ -239,7 +242,7 @@ jobs:
             #   Debug > Show Version
             # ---------------------------------------------------------------------------------------
 
-            - name: "Debug: Package Version"
+            - name: "🗔 Debug: Package Version"
               shell: bash
               run: |
                 echo -e "${{ env.VERSION_PACKAGE }}"
@@ -249,7 +252,7 @@ jobs:
             #   Debug > Tree
             # ---------------------------------------------------------------------------------------
 
-            - name: "Debug: Tree"
+            - name: "🗔 Debug: Tree"
               shell: bash
               run: |
                 tree
@@ -295,4 +298,3 @@ jobs:
             - name: "📦 Commit"
               id: task_build_commit
               uses: stefanzweifel/git-auto-commit-action@v5
-

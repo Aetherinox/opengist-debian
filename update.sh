@@ -220,15 +220,16 @@ opt_usage()
     echo -e 
     printf '  %-5s %-40s\n' "Usage:" "" 1>&2
     printf '  %-5s %-40s\n' "    " "${0} [${GREYL}options${NORMAL}]" 1>&2
-    printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}--skipChangelog${NORMAL}] [${GREYL}--force${NORMAL}] [${GREYL}--available 1.7.3${NORMAL}] [${GREYL}--version${NORMAL}] [${GREYL}--help${NORMAL}]" 1>&2
+    printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}--skipChangelog${NORMAL}] [${GREYL}--precheck${NORMAL}] [${GREYL}--force${NORMAL}] [${GREYL}--available 1.7.3${NORMAL}] [${GREYL}--version${NORMAL}] [${GREYL}--help${NORMAL}]" 1>&2
     printf '  %-5s %-40s\n' "Options:" "" 1>&2
-    printf '  %-5s %-24s %-40s\n' "    " "-p, --precheck" "Checks for update and returns result" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-p, --precheck" "check for update and return result. Does not actually update package." 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-a, --available" "specifies the available version released" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "" "used in combination with Github Workflow 'github-action-get-previous-tag'" 1>&2
-    printf '  %-5s %-24s %-40s\n' "    " "-s, --skipChangelog" "build package but do not inject anything into changelog" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-s, --skipChangelog" "build package but do not add anything into changelog" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-f, --force" "download and update Opengist no matter what version is installed" 1>&2
-    printf '  %-5s %-24s %-40s\n' "    " "-v, --version" "current version of app manager" 1>&2
-    printf '  %-5s %-24s %-40s\n' "    " "-h, --help" "show help menu" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "" "this will re-create every arch for Opengist and make a new .deb package for each" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-v, --version" "current version of this updater" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-h, --help" "show this help menu" 1>&2
     echo -e 
     echo -e 
     exit 1
@@ -239,11 +240,6 @@ opt_usage()
 #
 #   reminder that any functions which need executed must be defined BEFORE
 #   this point. Bash sucks like that.
-#
-#   --dev           show advanced printing
-#   --force         download and update Opengist no matter what version is installed
-#   --help          show help and usage information
-#   --version       display version information
 # #
 
 while [ $# -gt 0 ]; do
@@ -274,6 +270,7 @@ while [ $# -gt 0 ]; do
             OPT_VER_CURRENT="${1#*=}"
             if [ -z "${OPT_VER_CURRENT}" ]; then
                 echo -e "  ${NORMAL}Must specify the available version"
+                echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --available 1.7.3${NORMAL}"
                 exit 1
             fi
             ;;
@@ -327,6 +324,7 @@ if [ "${OPT_FORCE}" != "true" ] && ([ -z "${PKG_VER_CURRENT}" ] || [ "${PKG_VER_
     echo -e
     echo -e "  ${BOLD}${ORANGE}WARNING  ${WHITE}Did not specify ${ORANGE}--available${WHITE} to compare with.${NORMAL}"
     echo -e "  ${BOLD}You must specify ${ORANGE}--available 1.X.X${WHITE} when running the script.${NORMAL}"
+    echo -e "  ${BOLD}This is usually done by the Github workflow when it checks for Opengist updates.${NORMAL}"
     echo -e
     echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --available 1.7.3${NORMAL}"
     echo -e
