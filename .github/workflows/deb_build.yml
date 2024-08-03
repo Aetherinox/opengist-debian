@@ -77,10 +77,15 @@ jobs:
 
                 if [[ ! -z "${{ steps.previoustag.outputs.tag }}" ]]; then
                   command+=" --current ${{ steps.previoustag.outputs.tag }}"
+                else
+                  echo -e "No version specified, skipping build"
+                  exit 1
                 fi
 
                 # make file runnable, might not be necessary
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
+
+                echo -e "Sending command: ${$command}"
                 eval "./$command"
 
                 tree

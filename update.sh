@@ -316,10 +316,24 @@ while [ $# -gt 0 ]; do
 done
 
 # #
+#   func > version > compare greater than
+#
+#   this function compares two versions and determines if an update may
+#   be available. or the user is running a lesser version of a program.
+#
+#   @usage      : get_version_compare_gt 2.5.7 2.5.6 && echo "yes" || echo "no" # no
+# #
+
+get_version_compare_gt()
+{
+    test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
+}
+
+# #
 #   get specified installed version
 # #
 
-PKG_VER_INSTALLED=$( [[ -n "$OPT_VER_CURRENT" ]] && echo "$OPT_VER_CURRENT" || echo "false"  )
+PKG_VER_CURRENT=$( [[ -n "$OPT_VER_CURRENT" ]] && echo "$OPT_VER_CURRENT" || echo "false"  )
 
 # #
 #   if a current version has been specified.
@@ -328,7 +342,7 @@ PKG_VER_INSTALLED=$( [[ -n "$OPT_VER_CURRENT" ]] && echo "$OPT_VER_CURRENT" || e
 #   if no current version has been specified, script will exit
 # #
 
-if [ -z ${PKG_VER_INSTALLED} ] || [ ${PKG_VER_INSTALLED} == "false" ]; then
+if [ -z ${PKG_VER_CURRENT} ] || [ ${PKG_VER_CURRENT} == "false" ]; then
     exit 1
 fi
 
@@ -386,6 +400,34 @@ lst_arch=(
             PKG_FOLDER=($( echo ${PKG_URL} | sed 's:.*/::' | sed 's/\.tar\.gz//g' ) )
             PKG_ARCHIVE=($( echo ${PKG_URL} | sed 's:.*/::' ) )
             PKG_VER=($( echo ${PKG_ARCHIVE} | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/' ) )
+
+            # #
+            #    Check for available update
+            #
+            #       returns TRUE if specified version is higher than current version
+            #       returns FALSE if specified version is not higher than current version
+            # #
+
+            bUpdateAvailable=$(get_version_compare_gt "${PKG_VER_CURRENT}" "${PKG_VER}" && echo "true" || echo "false")
+
+            # #
+            #    Abort > Both versions are the same
+            # #
+
+            if [[ "${PKG_VER_CURRENT}" == "${PKG_VER}" ]]; then
+                echo -e "  ${WHITE}Abort               ${RED}Current version and built version are the same. No update found.${NORMAL}"
+                exit 1
+            fi
+
+            # #
+            #    Abort > Current version higher than specified version using argument
+            #       '-c, --current 1.X.X'
+            # #
+
+            if [[ "${bUpdateAvailable}" == "false" ]]; then
+                echo -e "  ${WHITE}Abort               ${RED}Current version is higher than specified version. No update found.${NORMAL}"
+                exit 1
+            fi
 
             # #
             #    Create /build/opengist-* folders
