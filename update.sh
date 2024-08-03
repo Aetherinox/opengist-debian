@@ -554,7 +554,7 @@ END_ED
             #   set permissions
             # #
 
-            sudo chmod 0775 src/$PKG_FOLDER/DEBIAN/postinst
+            sudo chmod 0775 $PKG_FOLDER/DEBIAN/postinst
 
             # #
             #   create .deb package
