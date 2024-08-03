@@ -168,7 +168,7 @@ jobs:
               shell: bash
               run: |
                 build_output=$(echo "${{ env._OUTPUT }}" | tail -n1)
-                echo "BUILD_OUTPUT=$(build_output)" >> "$GITHUB_ENV"
+                echo "BUILD_OUTPUT=$(echo ${build_output})" >> "$GITHUB_ENV"
                 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
