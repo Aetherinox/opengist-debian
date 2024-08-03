@@ -164,12 +164,14 @@ jobs:
                   
                 echo "EOF" >> $GITHUB_ENV
 
-            - name: parse the outputs
+            - name: parse the outputs 1
               shell: bash
               run: |
-                echo -e "${{ env.MULTI_LINES_TEXT_ENV_VAR }}"
                 echo -e "${{ env.MULTI_LINES_TEXT }}"
-                echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT_ENV_VAR }}
+
+            - name: parse the outputs 2
+              shell: bash
+              run: |
                 echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT }}
 
             # ---------------------------------------------------------------------------------------
