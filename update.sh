@@ -550,6 +550,12 @@ END_ED
                 cd src
 
             # #
+            #   set permissions
+            # #
+
+            sudo chmod 0775 DEBIAN/postinst
+
+            # #
             #   create .deb package
             # #
 
@@ -561,7 +567,7 @@ END_ED
             # #
 
             echo -e "  ${WHITE}Lintian:            ${GREEN}${PKG_FOLDER}${NORMAL}"
-            lintian ${$PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
+            lintian ${PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
 
             echo -e
 
