@@ -162,7 +162,6 @@ jobs:
               run: |
                 echo $EXECUTION_OUTPUT
                 echo -e ${{ steps.task_build_run.outputs.EXECUTION_OUTPUT }}
-                echo -e ${{ env.EXECUTION_OUTPUT }}
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
