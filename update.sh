@@ -10,9 +10,7 @@ echo
 #   tput setaf  [1-7]       : Set a foreground color using ANSI escape
 #   tput setf   [1-7]       : Set a foreground color
 # #
-case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
-esac
+
 BLACK=$(tput setaf 0)
 RED=$(tput setaf 1)
 ORANGE=$(tput setaf 208)
@@ -222,9 +220,10 @@ opt_usage()
     echo -e 
     printf '  %-5s %-40s\n' "Usage:" "" 1>&2
     printf '  %-5s %-40s\n' "    " "${0} [${GREYL}options${NORMAL}]" 1>&2
-    printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}--skipChangelog${NORMAL}] [${GREYL}--force${NORMAL}] [${GREYL}--current 1.7.3${NORMAL}] [${GREYL}--version${NORMAL}] [${GREYL}--help${NORMAL}]" 1>&2
+    printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}--skipChangelog${NORMAL}] [${GREYL}--force${NORMAL}] [${GREYL}--available 1.7.3${NORMAL}] [${GREYL}--version${NORMAL}] [${GREYL}--help${NORMAL}]" 1>&2
     printf '  %-5s %-40s\n' "Options:" "" 1>&2
-    printf '  %-5s %-24s %-40s\n' "    " "-c, --current" "specifies the current version released" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-p, --precheck" "Checks for update and returns result" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-a, --available" "specifies the available version released" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "" "used in combination with Github Workflow 'github-action-get-previous-tag'" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-s, --skipChangelog" "build package but do not inject anything into changelog" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-f, --force" "download and update Opengist no matter what version is installed" 1>&2
@@ -258,6 +257,10 @@ while [ $# -gt 0 ]; do
             OPT_FORCE=true
             ;;
 
+    -p*|--precheck*)
+            OPT_PRECHECK=true
+            ;;
+
     -s*|--skipChangelog*)
             OPT_SKIP_CHANGELOG=true
             ;;
@@ -266,11 +269,11 @@ while [ $# -gt 0 ]; do
             opt_usage
             ;;
 
-    -c*|--current*|--versionCurrent*)
+    -a*|--available*|--versionAvailable*)
             if [[ "$1" != *=* ]]; then shift; fi
             OPT_VER_CURRENT="${1#*=}"
             if [ -z "${OPT_VER_CURRENT}" ]; then
-                echo -e "  ${NORMAL}Must specify the current version"
+                echo -e "  ${NORMAL}Must specify the available version"
                 exit 1
             fi
             ;;
@@ -311,10 +314,10 @@ get_version_compare_gt()
 PKG_VER_CURRENT=$( [[ -n "$OPT_VER_CURRENT" ]] && echo "$OPT_VER_CURRENT" || echo "false"  )
 
 # #
-#   if a current version has been specified.
+#   if a available version has been specified.
 #   this will be matched against the latest released version.
 #
-#   if no current version has been specified, script will exit
+#   if no available version has been specified, script will exit
 # #
 
 if [ "${OPT_FORCE}" != "true" ] && ([ -z "${PKG_VER_CURRENT}" ] || [ "${PKG_VER_CURRENT}" == "false" ]); then
@@ -322,10 +325,10 @@ if [ "${OPT_FORCE}" != "true" ] && ([ -z "${PKG_VER_CURRENT}" ] || [ "${PKG_VER_
     echo -e
     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
     echo -e
-    echo -e "  ${BOLD}${ORANGE}WARNING  ${WHITE}Did not specify ${ORANGE}--current${WHITE} to compare with.${NORMAL}"
-    echo -e "  ${BOLD}You must specify ${ORANGE}--current 1.X.X${WHITE} when running the script.${NORMAL}"
+    echo -e "  ${BOLD}${ORANGE}WARNING  ${WHITE}Did not specify ${ORANGE}--available${WHITE} to compare with.${NORMAL}"
+    echo -e "  ${BOLD}You must specify ${ORANGE}--available 1.X.X${WHITE} when running the script.${NORMAL}"
     echo -e
-    echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --current 1.7.3${NORMAL}"
+    echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --available 1.7.3${NORMAL}"
     echo -e
     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
     echo -e
@@ -436,7 +439,7 @@ lst_arch=(
 
                 # #
                 #   Abort > Current version higher than specified version using argument
-                #       '-c, --current 1.X.X'
+                #       '-a, --available, --versionAvailable 1.X.X'
                 # #
 
                 if [[ "${bUpdateAvailable}" == "false" ]]; then
@@ -456,6 +459,30 @@ lst_arch=(
                     exit 1
                 fi
 
+                # #
+                #   Precheck for update. Go no further after this point
+                #       '-p, --precheck'
+                #
+                #   @example    : ./update.sh --available 1.7.1 --precheck
+                # #
+
+                if [[ "${OPT_PRECHECK}" == "true" ]]; then
+                    echo -e
+                    echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
+                    echo -e
+                    echo -e "  ${BOLD}${GREEN}SUCCESS  ${WHITE}An update appears to be available.${NORMAL}"
+                    echo -e "  ${BOLD}${WHITE}Run script again without ${GREEN}-p, --precheck${WHITE} to update.${NORMAL}"
+                    echo -e
+                    echo -e "      ${YELLOW}RUNNING VERSION${WHITE} > ${YELLOW}${PKG_VER_CURRENT}${NORMAL}"
+                    echo -e "      ${YELLOW}AVAILABLE VERSION${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
+                    echo -e
+                    echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
+                    echo -e
+
+                    rm *.tar.gz* >> /dev/null 2>&1
+
+                    exit 1
+                fi
             fi
 
             # #

@@ -83,16 +83,11 @@ jobs:
                 echo -e ${{ steps.previoustag.outputs.tag }}
 
             # ---------------------------------------------------------------------------------------
-            #   Run update.sh bash script
-            #
-            #   gets the most current tag released and compares it to the latest version of
-            #   opengist available.
-            #
-            #   if no update is available, script exists
+            #   precheck
             # ---------------------------------------------------------------------------------------
 
-            - name: "🔨 Build .deb"
-              id: task_build_run
+            - name: "🔨 Install Packages"
+              id: task_build_install
               run: |
 
                 # #
@@ -101,6 +96,77 @@ jobs:
 
                 sudo apt install tree
                 sudo apt install lintian
+
+            # ---------------------------------------------------------------------------------------
+            #   precheck
+            #
+            #   checks the Opengist repo to see if a newer version of Opengist has been released.
+            #   will then return whether an update is available or not and then exit.
+            #
+            #   @example    : ./update.sh -c 1.7.4 --precheck
+            # ---------------------------------------------------------------------------------------
+
+            - name: "🔨 Build › Precheck"
+              id: task_build_precheck
+              run: |
+
+                # #
+                #   base command
+                # #
+
+                command="update.sh --precheck"
+
+                # #
+                #   Get current version released from Github repo tags
+                # #
+
+                VER_RELEASED=$(echo "${{ steps.previoustag.outputs.tag }}" | sed 's/[v]*//g')
+
+                # #
+                #   If current tag exists, pass the latest tag version
+                #   over to bash script
+                # #
+
+                if [[ ! -z "${VER_RELEASED}" ]]; then
+                  command+=" --available ${VER_RELEASED}"
+                else
+                  echo -e "No version specified, skipping build"
+                  exit 1
+                fi
+
+                # #
+                #   permissions
+                # #
+
+                chmod +x "${GITHUB_WORKSPACE}/update.sh"
+
+                # #
+                #   save output of bash script to env var
+                # #
+
+                echo -e "Sending command: ${command}"
+                eval "./$command"
+
+            # ---------------------------------------------------------------------------------------
+            #   Run update.sh bash script
+            #
+            #   gets the most current tag released and compares it to the latest version of
+            #   opengist available.
+            #
+            #   if no update is available, script exists
+            #
+            #   bash script expects a version to be specified as an argument. This version is 
+            #   what the latest release is from the Opengist repository. It is then compared to the
+            #   latest released within this opengist-debian repo.
+            #
+            #   @example    : ./update.sh -c 1.7.4
+            #                 ./update.sh -c 1.7.4 --precheck
+            # ---------------------------------------------------------------------------------------
+
+            - name: "🔨 Build › .deb"
+              id: task_build_run
+              if: steps.task_build_precheck.outcome == 'success'
+              run: |
 
                 # #
                 #   base command
@@ -111,6 +177,9 @@ jobs:
                 # #
                 #   Input > skip changelog
                 #   appends -s, --skipChangelog to the command
+                #
+                #   if you want to add your own changelog entry, you must open
+                #   the update.sh bash file and edit the CHANGELOG multi-line var
                 # #
 
                 input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
@@ -131,15 +200,15 @@ jobs:
                 #   Get current version released from Github repo tags
                 # #
 
-                VER_CURRENT=$(echo "${{ steps.previoustag.outputs.tag }}" | sed 's/[v]*//g')
+                VER_RELEASED=$(echo "${{ steps.previoustag.outputs.tag }}" | sed 's/[v]*//g')
 
                 # #
                 #   If current tag exists, pass the latest tag version
                 #   over to bash script
                 # #
 
-                if [[ ! -z "${VER_CURRENT}" ]]; then
-                  command+=" --current ${VER_CURRENT}"
+                if [[ ! -z "${VER_RELEASED}" ]]; then
+                  command+=" --available ${VER_RELEASED}"
                 else
                   echo -e "No version specified, skipping build"
                   exit 1
