@@ -48,27 +48,15 @@ jobs:
               with:
                 fetch-depth: 0
 
-            # ---------------------------------------------------------------------------------------
-            #   Get version from package.json VERSION value
-            # ---------------------------------------------------------------------------------------
+            - name: 'Get Previous tag'
+              id: previoustag
+              uses: "WyriHaximus/github-action-get-previous-tag@v1"
+              with:
+                fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
+                #workingDirectory: another/path/where/a/git/repo/is/checked/out # Optional alternative working directory
 
-            - name: "🔨 Build .deb"
-              id: task_build_run
+            - name: "🔨 Get Current Version"
+              id: task_build_getver
               run: |
-                sudo apt install tree
-                command="update.sh"
-                input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
-                if [ "${input_EDIT_CHANGELOG}" = true ]; then
-                  command+=" -s"
-                fi
-
-                # make file runnable, might not be necessary
-                chmod +x "${GITHUB_WORKSPACE}/update.sh"
-                eval "./$command"
-
-                tree
-
-            - name: "📦 Commit"
-              id: task_build_commit
-              uses: stefanzweifel/git-auto-commit-action@v5
+                echo -e ${{ steps.previoustag.outputs.tag }}
 
