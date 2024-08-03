@@ -169,9 +169,6 @@ jobs:
               run: |
                 sha256="$(echo "${{ env.MULTI_LINES_TEXT }}" | tail -n1)"
                 echo "SHA256SUM=${sha256}" >> $GITHUB_ENV
-
-
-
                 echo -e "${{ env.MULTI_LINES_TEXT }}"
 
             - name: parse the outputs 22
