@@ -160,14 +160,15 @@ jobs:
                   
                 # here we can place the command that will generate multi-line text
                 # echo $MULTI_LINES_TEXT >> $GITHUB_ENV 
-                echo "BUILD_OUTPUT=$(eval ./$command)" >> "$GITHUB_ENV"
+                echo "MULTI_LINES_TEXT=$(eval ./$command)" >> "$GITHUB_ENV"
                   
                 echo "EOF" >> $GITHUB_ENV
 
-            - name: "Version"
+            - name: parse the output
               shell: bash
               run: |
-                echo "${{ env.BUILD_OUTPUT }}" | tail -n1
+                echo -e "${{ env.MULTI_LINES_TEXT }}"
+                echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT }}
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
