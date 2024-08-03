@@ -182,7 +182,7 @@ jobs:
             # ---------------------------------------------------------------------------------------
 
             - name: >-
-                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-386.deb
+                📋 Upload Artifacts › opengist${{ env.VERSION_TEXT }}-linux-386.deb
               id: task_build_artifact_i386
               uses: actions/upload-artifact@v4
               if: always()
