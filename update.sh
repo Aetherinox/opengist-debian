@@ -400,10 +400,10 @@ lst_arch=(
             PKG_VER=($( echo ${PKG_ARCHIVE} | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/' ) )
 
             # #
-            #   version checks are ran if -f, --force are not specified
+            #   version checks are ran if -f, --force are not specified OR -p, --precheck
             # #
 
-            if [ "${OPT_FORCE}" != "true" ]; then
+            if [ "${OPT_FORCE}" != "true" ] || [ "${OPT_PRECHECK}" == "true" ]; then
 
                 # #
                 #   Check for available update
