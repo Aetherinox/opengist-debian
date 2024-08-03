@@ -548,12 +548,14 @@ END_ED
                     #   create .deb package
                     # #
 
+                    echo -e "  ${WHITE}DPKGdeb:            ${GREEN}${PKG_FOLDER}${NORMAL}"
                     dpkg-deb --root-owner-group --build $PKG_FOLDER
 
                     # #
                     #   run lintian
                     # #
 
+                    echo -e "  ${WHITE}Lintian:            ${GREEN}${PKG_FOLDER}${NORMAL}"
                     lintian ${$PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
 
             fi
