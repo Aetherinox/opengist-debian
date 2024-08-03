@@ -33,13 +33,17 @@ jobs:
             packages: write
         steps:
 
+            # ---------------------------------------------------------------------------------------
+            #   Job > Start
+            # ---------------------------------------------------------------------------------------
+
             - name: "✅ Start"
               id: task_build_start
               run: |
                 echo "Starting build"
 
             # ---------------------------------------------------------------------------------------
-            #   Job > Initialize > Checkout
+            #   Job > Checkout
             # ---------------------------------------------------------------------------------------
 
             - name: "☑️ Checkout"
@@ -48,20 +52,32 @@ jobs:
               with:
                 fetch-depth: 0
 
-            - name: 'Get Previous tag'
+            # ---------------------------------------------------------------------------------------
+            #   Job > Get Previous Tag
+            # ---------------------------------------------------------------------------------------
+
+            - name: "Get Previous tag"
               id: previoustag
               uses: "WyriHaximus/github-action-get-previous-tag@v1"
               with:
                 fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
-                #workingDirectory: another/path/where/a/git/repo/is/checked/out # Optional alternative working directory
 
-            - name: "🔨 Get Current Version"
+            # ---------------------------------------------------------------------------------------
+            #   Job > Print Current Version
+            # ---------------------------------------------------------------------------------------
+
+            - name: "🔨 Print Current Version"
               id: task_build_getver
               run: |
                 echo -e ${{ steps.previoustag.outputs.tag }}
 
             # ---------------------------------------------------------------------------------------
-            #   Get version from package.json VERSION value
+            #   Run update.sh bash script
+            #
+            #   gets the most current tag released and compares it to the latest version of
+            #   opengist available.
+            #
+            #   if no update is available, script exists
             # ---------------------------------------------------------------------------------------
 
             - name: "🔨 Build .deb"
@@ -76,7 +92,7 @@ jobs:
                 fi
 
                 VER_CURRENT=$(echo "${{ steps.previoustag.outputs.tag }}" | sed 's/[v]*//g')
-                
+
                 if [[ ! -z "${VER_CURRENT}" ]]; then
                   command+=" --current ${VER_CURRENT}"
                 else

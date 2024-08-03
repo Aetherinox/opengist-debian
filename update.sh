@@ -416,6 +416,7 @@ lst_arch=(
 
             if [[ "${PKG_VER_CURRENT}" == "${PKG_VER}" ]]; then
                 echo -e "  ${WHITE}Abort               ${RED}Current version and built version are the same. No update found.${NORMAL}"
+                echo -e "  ${WHITE}                    ${YELLOW}${PKG_VER_CURRENT}${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
                 exit 1
             fi
 
@@ -426,6 +427,7 @@ lst_arch=(
 
             if [[ "${bUpdateAvailable}" == "false" ]]; then
                 echo -e "  ${WHITE}Abort               ${RED}Current version is higher than specified version. No update found.${NORMAL}"
+                echo -e "  ${WHITE}                    ${YELLOW}${PKG_VER_CURRENT}${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
                 exit 1
             fi
 
