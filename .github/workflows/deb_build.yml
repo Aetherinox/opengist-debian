@@ -160,7 +160,7 @@ jobs:
                   
                 # here we can place the command that will generate multi-line text
                 # echo $MULTI_LINES_TEXT >> $GITHUB_ENV 
-                echo "MULTI_LINES_TEXT=$(eval ./$command)" >> "$GITHUB_ENV"
+                echo "MULTI_LINES_TEXT=$(eval ./$command | tail -n1)" >> "$GITHUB_ENV"
                   
                 echo "EOF" >> $GITHUB_ENV
 
