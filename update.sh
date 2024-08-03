@@ -389,7 +389,7 @@ lst_arch=(
             echo -e "  ${WHITE}Download            ${GREEN}${PKG_URL}${NORMAL}"
 
             # #
-            #    Assign file names
+            #   Assign file names
             # #
 
             PKG_FOLDER=($( echo ${PKG_URL} | sed 's:.*/::' | sed 's/\.tar\.gz//g' ) )
@@ -397,13 +397,13 @@ lst_arch=(
             PKG_VER=($( echo ${PKG_ARCHIVE} | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/' ) )
 
             # #
-            #    version checks are ran if -f, --force are not specified
+            #   version checks are ran if -f, --force are not specified
             # #
 
             if [ "${OPT_FORCE}" != "true" ]; then
 
                 # #
-                #    Check for available update
+                #   Check for available update
                 #
                 #       returns TRUE if specified version is higher than current version
                 #       returns FALSE if specified version is not higher than current version
@@ -414,7 +414,7 @@ lst_arch=(
 
 
                 # #
-                #    Abort > Both versions are the same
+                #   Abort > Both versions are the same
                 # #
 
                 if [[ "${PKG_VER_CURRENT}" == "${PKG_VER}" ]]; then
@@ -435,7 +435,7 @@ lst_arch=(
                 fi
 
                 # #
-                #    Abort > Current version higher than specified version using argument
+                #   Abort > Current version higher than specified version using argument
                 #       '-c, --current 1.X.X'
                 # #
 
@@ -459,62 +459,62 @@ lst_arch=(
             fi
 
             # #
-            #    Create /build/opengist-* folders
+            #   Create /build/opengist-* folders
             # #
 
             mkdir -p build/opengist-${arch} | tar -xvzf ${PKG_ARCHIVE} -C build/opengist-${arch} >> /dev/null 2>&1
             echo -e "  ${WHITE}Extract:            ${GREEN}${PKG_ARCHIVE}${WHITE} > ${GREEN}build/opengist-${arch}${NORMAL}"
 
             # #
-            #    Delete the original .tar.gz files
+            #   Delete the original .tar.gz files
             # #
 
             rm opengist*.tar.gz >> /dev/null 2>&1
 
             # #
-            #    Copy opengist binary file
+            #   Copy opengist binary file
             # #
 
             cp build/opengist-${arch}/opengist/opengist src/$PKG_FOLDER/usr/bin/opengist >> /dev/null 2>&1
 
             # #
-            #    Copy opengist config.yml
+            #   Copy opengist config.yml
             # #
 
             cp build/opengist-${arch}/opengist/config.yml src/$PKG_FOLDER/etc/opengist/config.yml >> /dev/null 2>&1
             cp build/opengist-${arch}/opengist/config.yml src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml >> /dev/null 2>&1
 
             # #
-            #    open 'DEBIAN/control' and change version number
+            #   open 'DEBIAN/control' and change version number
             # #
 
             sed -Ei "s/(Version:) .*/\1 ${PKG_VER}/" src/$PKG_FOLDER/DEBIAN/control >> /dev/null 2>&1
 
             # #
-            #    open 'usr/share/applications/opengist.desktop' and change version number
+            #   open 'usr/share/applications/opengist.desktop' and change version number
             # #
 
             sed -Ei "s/(Version=).*/\1${PKG_VER}/" src/$PKG_FOLDER/usr/share/applications/opengist.desktop >> /dev/null 2>&1
 
             # #
-            #    Skip changelog
+            #   Skip changelog
             # #
 
             if [ -z "${OPT_SKIP_CHANGELOG}" ] || [ "${OPT_SKIP_CHANGELOG}" = false ]; then
 
                 # #
-                #    changelog
+                #   changelog
                 # #
 
                     # #
-                    #    changelog > decompress
+                    #   changelog > decompress
                     # #
 
                     gunzip src/$PKG_FOLDER/usr/share/doc/opengist/changelog.gz >> /dev/null 2>&1
                     echo -e "  ${WHITE}Changelog > Unzip   ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
 
                     # #
-                    #    changelog > AMD64 > append to top of file
+                    #   changelog > AMD64 > append to top of file
                     #       1i      : insert before line 1
                     #       .       : end inserting
                     #       wq      : save and quit
@@ -533,11 +533,28 @@ END_ED
                     echo -e "  ${WHITE}Changelog > Change  ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
 
                     # #
-                    #    changelog > compress
+                    #   changelog > compress
                     # #
 
                     gzip --best -n src/$PKG_FOLDER/usr/share/doc/opengist/changelog
                     echo -e "  ${WHITE}Changelog > Zip     ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
+
+                    # #
+                    #   change directory
+                    # #
+                        cd src
+
+                    # #
+                    #   create .deb package
+                    # #
+
+                    dpkg-deb --root-owner-group --build $PKG_FOLDER
+
+                    # #
+                    #   run lintian
+                    # #
+
+                    lintian ${$PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
 
             fi
 

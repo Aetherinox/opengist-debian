@@ -18,6 +18,17 @@ on:
         default:      true
         type:         boolean
 
+      # ---------------------------------------------------------------------------------------
+      #   ENABLE:   Forces all packages to be re-created
+      #   DISABLE:  packages will only be created if update to Opengist is available
+      # ---------------------------------------------------------------------------------------
+
+      FLAG_FORCE:
+        description:  "🗂️ Force"
+        required:     true
+        default:      false
+        type:         boolean
+
 jobs:
 
     # ---------------------------------------------------------------------------------------
@@ -83,15 +94,49 @@ jobs:
             - name: "🔨 Build .deb"
               id: task_build_run
               run: |
-                sudo apt install tree
-                command="update.sh"
-                input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
 
+                # #
+                #   install packages
+                # #
+
+                sudo apt install tree
+                sudo apt install lintian
+
+                # #
+                #   base command
+                # #
+
+                command="update.sh"
+
+                # #
+                #   Input > skip changelog
+                #   appends -s, --skipChangelog to the command
+                # #
+
+                input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
                 if [ "${input_EDIT_CHANGELOG}" = true ]; then
                   command+=" --skipChangelog"
                 fi
 
+                # #
+                #   Input > Force
+                #   appends -f, --force to the command
+                # #
+
+                if [ "${{ inputs.FLAG_FORCE }}" = true ]; then
+                  command+=" --force"
+                fi
+
+                # #
+                #   Get current version released from Github repo tags
+                # #
+
                 VER_CURRENT=$(echo "${{ steps.previoustag.outputs.tag }}" | sed 's/[v]*//g')
+
+                # #
+                #   If current tag exists, pass the latest tag version
+                #   over to bash script
+                # #
 
                 if [[ ! -z "${VER_CURRENT}" ]]; then
                   command+=" --current ${VER_CURRENT}"
@@ -99,6 +144,10 @@ jobs:
                   echo -e "No version specified, skipping build"
                   exit 1
                 fi
+
+                # #
+                #   permissions
+                # #
 
                 # make file runnable, might not be necessary
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
