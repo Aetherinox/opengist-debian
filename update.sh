@@ -222,11 +222,14 @@ opt_usage()
     echo -e 
     printf '  %-5s %-40s\n' "Usage:" "" 1>&2
     printf '  %-5s %-40s\n' "    " "${0} [${GREYL}options${NORMAL}]" 1>&2
-    printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}-s${NORMAL}] [${GREYL}-t${NORMAL}] [${GREYL}-g${NORMAL}] [${GREYL}-p${NORMAL}] [${GREYL}-d${NORMAL}] [${GREYL}-n${NORMAL}] [${GREYL}-q${NORMAL}] [${GREYL}-u${NORMAL}] [${GREYL}-b main | dev${NORMAL}] [${GREYL}-r${NORMAL}]" 1>&2
+    printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}--skipChangelog${NORMAL}] [${GREYL}--force${NORMAL}] [${GREYL}--current 1.7.3${NORMAL}] [${GREYL}--version${NORMAL}] [${GREYL}--help${NORMAL}]" 1>&2
     printf '  %-5s %-40s\n' "Options:" "" 1>&2
-    printf '  %-5s %-18s %-40s\n' "    " "-s, --skipChangelog" "build package but do not inject anything into changelog" 1>&2
-    printf '  %-5s %-18s %-40s\n' "    " "-v, --version" "current version of app manager" 1>&2
-    printf '  %-5s %-18s %-40s\n' "    " "-h, --help" "show help menu" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-c, --current" "specifies the current version released" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "" "used in combination with Github Workflow 'github-action-get-previous-tag'" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-s, --skipChangelog" "build package but do not inject anything into changelog" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-f, --force" "download and update Opengist no matter what version is installed" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-v, --version" "current version of app manager" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-h, --help" "show help menu" 1>&2
     echo -e 
     echo -e 
     exit 1
@@ -239,40 +242,8 @@ opt_usage()
 #   this point. Bash sucks like that.
 #
 #   --dev           show advanced printing
-#
-#   --dist          specifies a specific distribution
-#                   jammy, lunar, focal, noble, etc
-#
-#   --setup         installs all required dependencies for proteus script
-#                   apt-move, apt-url, curl, wget, tree, reprepro, lastversion
-#
-#   --gpg           adds new entries to "/home/${USER}/.gnupg/gpg-agent.conf"
-#
-#   --onlyTest      downloads packages from both apt-get and LastVersion
-#                   does not push packages to Github proteus repo
-#
-#   --onlyGithub    only downloads packages from github using LastVersion
-#                   does not download packages from apt-get
-#
-#   --onlyAptget    only downloads packages from apt-get
-#                   does not download packages from github using LastVersion
-#
+#   --force         download and update Opengist no matter what version is installed
 #   --help          show help and usage information
-#
-#   --branch        used in combination with --update
-#                   used to install proteus apt script from another github
-#                   branch such as development branch
-#
-#   --nullrun       used for testing functionality
-#                   does not download packages
-#                   does not modify file permissions
-#                   does not add packages to reprepro
-#                   does not push changes to github
-#
-#   --quiet         no logs output to pipe file
-#
-#   --update        downloads the latest proteus script to local folder
-#
 #   --version       display version information
 # #
 
@@ -283,6 +254,10 @@ while [ $# -gt 0 ]; do
             echo -e "  ${FUCHSIA}${BLINK}Devmode Enabled${NORMAL}"
             ;;
 
+    -f*|--force*)
+            OPT_FORCE=true
+            ;;
+
     -s*|--skipChangelog*)
             OPT_SKIP_CHANGELOG=true
             ;;
@@ -291,7 +266,7 @@ while [ $# -gt 0 ]; do
             opt_usage
             ;;
 
-    -c*|--current*)
+    -c*|--current*|--versionCurrent*)
             if [[ "$1" != *=* ]]; then shift; fi
             OPT_VER_CURRENT="${1#*=}"
             if [ -z "${OPT_VER_CURRENT}" ]; then
@@ -342,9 +317,29 @@ PKG_VER_CURRENT=$( [[ -n "$OPT_VER_CURRENT" ]] && echo "$OPT_VER_CURRENT" || ech
 #   if no current version has been specified, script will exit
 # #
 
-if [ -z ${PKG_VER_CURRENT} ] || [ ${PKG_VER_CURRENT} == "false" ]; then
+if [ "${OPT_FORCE}" != "true" ] && ([ -z "${PKG_VER_CURRENT}" ] || [ "${PKG_VER_CURRENT}" == "false" ]); then
+
+    echo -e
+    echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
+    echo -e
+    echo -e "  ${BOLD}${ORANGE}WARNING  ${WHITE}Did not specify ${ORANGE}--current${WHITE} to compare with.${NORMAL}"
+    echo -e "  ${BOLD}You must specify ${ORANGE}--current 1.X.X${WHITE} when running the script.${NORMAL}"
+    echo -e
+    echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --current 1.7.3${NORMAL}"
+    echo -e
+    echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
+    echo -e
+
+    rm *.tar.gz* >> /dev/null 2>&1
+
     exit 1
 fi
+
+# #
+#   remove all .tar.gz files
+# #
+
+rm *.tar.gz* >> /dev/null 2>&1
 
 # #
 #   git > clone
@@ -402,33 +397,65 @@ lst_arch=(
             PKG_VER=($( echo ${PKG_ARCHIVE} | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/' ) )
 
             # #
-            #    Check for available update
-            #
-            #       returns TRUE if specified version is higher than current version
-            #       returns FALSE if specified version is not higher than current version
+            #    version checks are ran if -f, --force are not specified
             # #
 
-            bUpdateAvailable=$(get_version_compare_gt "${PKG_VER_CURRENT}" "${PKG_VER}" && echo "true" || echo "false")
+            if [ "${OPT_FORCE}" != "true" ]; then
 
-            # #
-            #    Abort > Both versions are the same
-            # #
+                # #
+                #    Check for available update
+                #
+                #       returns TRUE if specified version is higher than current version
+                #       returns FALSE if specified version is not higher than current version
+                # #
 
-            if [[ "${PKG_VER_CURRENT}" == "${PKG_VER}" ]]; then
-                echo -e "  ${WHITE}Abort               ${RED}Current version and built version are the same. No update found.${NORMAL}"
-                echo -e "  ${WHITE}                    ${YELLOW}${PKG_VER_CURRENT}${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
-                exit 1
-            fi
+                bUpdateAvailable=$(get_version_compare_gt "${PKG_VER}" "${PKG_VER_CURRENT}" && echo "true" || echo "false")
+                echo -e "Update Available: ${bUpdateAvailable}"
 
-            # #
-            #    Abort > Current version higher than specified version using argument
-            #       '-c, --current 1.X.X'
-            # #
 
-            if [[ "${bUpdateAvailable}" == "false" ]]; then
-                echo -e "  ${WHITE}Abort               ${RED}Current version is higher than specified version. No update found.${NORMAL}"
-                echo -e "  ${WHITE}                    ${YELLOW}${PKG_VER_CURRENT}${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
-                exit 1
+                # #
+                #    Abort > Both versions are the same
+                # #
+
+                if [[ "${PKG_VER_CURRENT}" == "${PKG_VER}" ]]; then
+                    echo -e
+                    echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
+                    echo -e
+                    echo -e "  ${BOLD}${ORANGE}ABORTING  ${WHITE}Current version and built version are the same. No update found.${NORMAL}"
+                    echo -e
+                    echo -e "      ${YELLOW}CURRENT VERSION${WHITE} > ${YELLOW}${PKG_VER_CURRENT}${NORMAL}"
+                    echo -e "      ${YELLOW}PACKAGE VERSION${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
+                    echo -e
+                    echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
+                    echo -e
+
+                    rm *.tar.gz* >> /dev/null 2>&1
+
+                    exit 1
+                fi
+
+                # #
+                #    Abort > Current version higher than specified version using argument
+                #       '-c, --current 1.X.X'
+                # #
+
+                if [[ "${bUpdateAvailable}" == "false" ]]; then
+                    echo -e
+                    echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
+                    echo -e
+                    echo -e "  ${BOLD}${ORANGE}ABORTING  ${WHITE}Current version is higher than specified version. No update found.${NORMAL}"
+                    echo -e
+                    echo -e "      ${YELLOW}CURRENT VERSION${WHITE} > ${YELLOW}${PKG_VER_CURRENT}${NORMAL}"
+                    echo -e "      ${YELLOW}PACKAGE VERSION${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
+                    echo -e
+                    echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
+                    echo -e
+
+                    rm *.tar.gz* >> /dev/null 2>&1
+
+                    exit 1
+                fi
+
             fi
 
             # #
