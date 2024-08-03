@@ -548,21 +548,21 @@ END_ED
             #   set permissions
             # #
 
-            sudo chmod 0775 $PKG_FOLDER/DEBIAN/postinst
+            sudo chmod 0775 src/${PKG_FOLDER}/DEBIAN/postinst
 
             # #
             #   create .deb package
             # #
 
             echo -e "  ${WHITE}DPKGdeb:            ${GREEN}${PKG_FOLDER}${NORMAL}"
-            dpkg-deb --root-owner-group --build $PKG_FOLDER
+            dpkg-deb --root-owner-group --build src/${PKG_FOLDER}
 
             # #
             #   run lintian
             # #
 
             echo -e "  ${WHITE}Lintian:            ${GREEN}${PKG_FOLDER}${NORMAL}"
-            lintian ${PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
+            lintian src/${PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
 
             echo -e
 
