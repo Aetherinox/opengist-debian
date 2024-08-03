@@ -578,9 +578,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  dist/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  dist/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  dist/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   ${{ steps.task_release_changelog_categorized.outputs.changelog }}
@@ -600,9 +600,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  dist/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  dist/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  dist/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   > [!WARNING]
