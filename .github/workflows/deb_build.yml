@@ -167,7 +167,7 @@ jobs:
             - name: "Version"
               shell: bash
               run: |
-                build_output="echo ${{ env._OUTPUT }}" | tail -n1
+                build_output=$(echo "${{ env._OUTPUT }}" | tail -n1)
                 echo "BUILD_OUTPUT=$(build_output)" >> "$GITHUB_ENV"
                 
             # ---------------------------------------------------------------------------------------
