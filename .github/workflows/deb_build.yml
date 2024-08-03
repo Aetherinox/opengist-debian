@@ -169,7 +169,7 @@ jobs:
               run: |
                 echo -e "${{ env.MULTI_LINES_TEXT }}"
 
-            - name: parse the outputs 2
+            - name: parse the outputs 22
               shell: bash
               run: |
                 echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT }}
