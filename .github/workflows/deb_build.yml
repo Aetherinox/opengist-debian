@@ -600,9 +600,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   > [!WARNING]
