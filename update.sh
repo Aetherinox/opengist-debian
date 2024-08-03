@@ -291,6 +291,15 @@ while [ $# -gt 0 ]; do
             opt_usage
             ;;
 
+    -c*|--current*)
+            if [[ "$1" != *=* ]]; then shift; fi
+            OPT_VER_CURRENT="${1#*=}"
+            if [ -z "${OPT_VER_CURRENT}" ]; then
+                echo -e "  ${NORMAL}Must specify the current version"
+                exit 1
+            fi
+            ;;
+
     -v|--version)
             echo
             echo -e "  ${GREEN}${BOLD}${app_title}${NORMAL} - v$(get_version)${NORMAL}"
@@ -307,7 +316,24 @@ while [ $# -gt 0 ]; do
 done
 
 # #
-#   clone opengist-debian repo
+#   get specified installed version
+# #
+
+PKG_VER_INSTALLED=$( [[ -n "$OPT_VER_CURRENT" ]] && echo "$OPT_VER_CURRENT" || echo "false"  )
+
+# #
+#   if a current version has been specified.
+#   this will be matched against the latest released version.
+#
+#   if no current version has been specified, script will exit
+# #
+
+if [ -z ${PKG_VER_INSTALLED} ] || [ ${PKG_VER_INSTALLED} == "false" ]; then
+    exit 1
+fi
+
+# #
+#   git > clone
 # #
 
 git clone "${app_repo_url}.git" >> /dev/null 2>&1

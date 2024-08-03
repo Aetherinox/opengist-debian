@@ -60,3 +60,32 @@ jobs:
               run: |
                 echo -e ${{ steps.previoustag.outputs.tag }}
 
+            # ---------------------------------------------------------------------------------------
+            #   Get version from package.json VERSION value
+            # ---------------------------------------------------------------------------------------
+
+            - name: "🔨 Build .deb"
+              id: task_build_run
+              run: |
+                sudo apt install tree
+                command="update.sh"
+                input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
+
+                if [ "${input_EDIT_CHANGELOG}" = true ]; then
+                  command+=" --skipChangelog"
+                fi
+
+                if [[ ! -z "${{ steps.previoustag.outputs.tag }}" ]]; then
+                  command+=" --current ${{ steps.previoustag.outputs.tag }}"
+                fi
+
+                # make file runnable, might not be necessary
+                chmod +x "${GITHUB_WORKSPACE}/update.sh"
+                eval "./$command"
+
+                tree
+
+            - name: "📦 Commit"
+              id: task_build_commit
+              uses: stefanzweifel/git-auto-commit-action@v5
+
