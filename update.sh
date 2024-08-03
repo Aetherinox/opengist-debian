@@ -547,13 +547,13 @@ END_ED
             # #
             #   change directory
             # #
-                cd src
+            cd src
 
             # #
             #   set permissions
             # #
 
-            sudo chmod 0775 DEBIAN/postinst
+            sudo chmod 0775 src/DEBIAN/postinst
 
             # #
             #   create .deb package
