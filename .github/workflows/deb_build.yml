@@ -196,7 +196,7 @@ jobs:
               if: always()
               with:
                 name: "opengist${{ env.VERSION_PACKAGE }}-linux-386.deb"
-                path: opengist${{ env.VERSION_PACKAGE }}-linux-386*.deb
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-386*.deb
                 retention-days: 30
 
             - name: >-
@@ -206,7 +206,7 @@ jobs:
               if: always()
               with:
                 name: "opengist${{ env.VERSION_PACKAGE }}-linux-amd64.deb"
-                path: opengist${{ env.VERSION_PACKAGE }}-linux-amd64*.deb
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-amd64*.deb
                 retention-days: 30
 
             - name: >-
@@ -216,7 +216,7 @@ jobs:
               if: always()
               with:
                 name: "opengist${{ env.VERSION_PACKAGE }}-linux-arm64.deb"
-                path: opengist${{ env.VERSION_PACKAGE }}-linux-arm64*.deb
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-arm64*.deb
                 retention-days: 30
 
             # ---------------------------------------------------------------------------------------
