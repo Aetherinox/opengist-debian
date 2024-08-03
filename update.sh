@@ -466,7 +466,7 @@ lst_arch=(
                 #   @example    : ./update.sh --available 1.7.1 --precheck
                 # #
 
-                if [[ "${OPT_PRECHECK}" == "true" ]]; then
+                if [[ "${bUpdateAvailable}" == "true" ]]; then
                     echo -e
                     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
                     echo -e
@@ -478,11 +478,6 @@ lst_arch=(
                     echo -e
                     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
                     echo -e
-
-                    if [ "${OPT_FORCE}" != "true" ]; then
-                        rm *.tar.gz* >> /dev/null 2>&1
-                        exit 1
-                    fi
                 fi
             fi
 
