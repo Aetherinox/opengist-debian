@@ -39,6 +39,7 @@ END="\e[0m"
 #   DEFINE > Default Arguments
 # #
 
+OPT_PACKAGE_NAME="opengist"
 OPT_DEV_ENABLE="false"
 OPT_FORCE="false"
 OPT_PRECHECK="false"
@@ -231,6 +232,8 @@ opt_usage()
     printf '  %-5s %-40s\n' "    " "${0} [${GREYL}options${NORMAL}]" 1>&2
     printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}--skipChangelog${NORMAL}] [${GREYL}--precheck${NORMAL}] [${GREYL}--force${NORMAL}] [${GREYL}--available 1.7.3${NORMAL}] [${GREYL}--version${NORMAL}] [${GREYL}--help${NORMAL}]" 1>&2
     printf '  %-5s %-40s\n' "Options:" "" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-n, --name" "sets package name" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "" "'${OPT_PACKAGE_NAME}' by default" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-p, --precheck" "check for update and return result. Does not actually update package." 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-a, --available" "specifies the available version released" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "" "used in combination with Github Workflow 'github-action-get-previous-tag'" 1>&2
@@ -253,6 +256,17 @@ opt_usage()
 
 while [ $# -gt 0 ]; do
   case "$1" in
+    -n*|--name*)
+            if [[ "$1" != *=* ]]; then shift; fi
+            OPT_PACKAGE_NAME="${1#*=}"
+            if [ -z "${OPT_PACKAGE_NAME}" ]; then
+                echo -e "  ${NORMAL}Must specify a valid name"
+                echo -e "  ${NORMAL}      Default:  ${YELLOW}${OPT_PACKAGE_NAME}${NORMAL}"
+
+                exit 1
+            fi
+            ;;
+
     -d|--dev)
             OPT_DEV_ENABLE="true"
             echo -e "  ${FUCHSIA}${BLINK}Devmode Enabled${NORMAL}"
@@ -494,27 +508,27 @@ lst_arch=(
             #   Create /build/opengist-* folders
             # #
 
-            mkdir -p build/opengist-${arch} | tar -xvzf ${PKG_ARCHIVE} -C build/opengist-${arch} >> /dev/null 2>&1
-            echo -e "  ${WHITE}Extract:            ${GREEN}${PKG_ARCHIVE}${WHITE} > ${GREEN}build/opengist-${arch}${NORMAL}"
+            mkdir -p build/${OPT_PACKAGE_NAME}-${arch} | tar -xvzf ${PKG_ARCHIVE} -C build/${OPT_PACKAGE_NAME}-${arch} >> /dev/null 2>&1
+            echo -e "  ${WHITE}Extract:            ${GREEN}${PKG_ARCHIVE}${WHITE} > ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}${NORMAL}"
 
             # #
             #   Delete the original .tar.gz files
             # #
 
-            rm opengist*.tar.gz >> /dev/null 2>&1
+            rm ${OPT_PACKAGE_NAME}*.tar.gz >> /dev/null 2>&1
 
             # #
             #   Copy opengist binary file
             # #
 
-            cp build/opengist-${arch}/opengist/opengist src/$PKG_FOLDER/usr/bin/opengist >> /dev/null 2>&1
+            cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/opengist src/$PKG_FOLDER/usr/bin/opengist >> /dev/null 2>&1
 
             # #
             #   Copy opengist config.yml
             # #
 
-            cp build/opengist-${arch}/opengist/config.yml src/$PKG_FOLDER/etc/opengist/config.yml >> /dev/null 2>&1
-            cp build/opengist-${arch}/opengist/config.yml src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml >> /dev/null 2>&1
+            cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml src/$PKG_FOLDER/etc/opengist/config.yml >> /dev/null 2>&1
+            cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml >> /dev/null 2>&1
 
             # #
             #   open 'DEBIAN/control' and change version number
@@ -554,7 +568,7 @@ lst_arch=(
 
 ed src/$PKG_FOLDER/usr/share/doc/opengist/changelog << END_ED > /dev/null
 1i
-opengist (${PKG_VER}) stable; urgency=low
+${OPT_PACKAGE_NAME} (${PKG_VER}) stable; urgency=low
 
 ${CHANGELOG}
 

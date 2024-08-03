@@ -122,9 +122,9 @@ jobs:
     job-build:
         name: >-
           📦 Build › Package
+        runs-on: ubuntu-latest
         outputs:
           package_version: ${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}
-        runs-on: ubuntu-latest
         permissions:
             contents: write
             packages: write
@@ -315,9 +315,9 @@ jobs:
                 # #
 
                 echo -e "Sending command: ${command}"
-                echo "PACKAGE_VERSION<<EOF" >> $GITHUB_ENV
-                echo "$(eval ./$command | tail -n1)" >> "$GITHUB_ENV"
-                echo "EOF" >> $GITHUB_ENV
+                echo "PACKAGE_VERSION<<EOF" >> $GITHUB_OUTPUT
+                echo "$(eval ./$command | tail -n1)" >> "$GITHUB_OUTPUT"
+                echo "EOF" >> $GITHUB_OUTPUT
 
                 # #
                 #   old run command
@@ -349,33 +349,33 @@ jobs:
             # ---------------------------------------------------------------------------------------
 
             - name: >-
-                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
               id: task_build_artifact_i386
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: "${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386*.deb
+                name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb"
+                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386*.deb
                 retention-days: 30
 
             - name: >-
-                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
               id: task_build_artifact_amd64
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: "${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64*.deb
+                name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb"
+                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64*.deb
                 retention-days: 30
 
             - name: >-
-                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
               id: task_build_artifact_arm64
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: "${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64*.deb
+                name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb"
+                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64*.deb
                 retention-days: 30
 
             # ---------------------------------------------------------------------------------------
@@ -393,12 +393,13 @@ jobs:
     job-release:
         name: >-
           📦 Build › Release
+        runs-on: ubuntu-latest
+        needs: [ job-build ]
         env:
           PACKAGE_VERSION: ${{ needs.job-build.outputs.package_version }}
-        needs: [ job-build ]
-        runs-on: ubuntu-latest
         permissions:
-          contents: write
+            contents: write
+            packages: write
         steps:
 
             # ---------------------------------------------------------------------------------------
