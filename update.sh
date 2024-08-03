@@ -544,6 +544,9 @@ lst_arch=(
 
             # #
             #   Skip changelog
+            #
+            #   do not edit changelog if -s, --skipChangelog
+            #   do not edit changelog if -p, --precheck
             # #
 
             if [ "${OPT_SKIP_CHANGELOG}" == "false" ] && [ "${OPT_PRECHECK}" == "false" ]; then
