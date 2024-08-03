@@ -156,34 +156,51 @@ jobs:
                 # echo "EXECUTION_OUTPUT=$(eval ./$command)" >> "$GITHUB_ENV"
                 # eval "./$command"
 
-                echo "MULTI_LINES_TEXT_ENV_VAR<<EOF" >> $GITHUB_ENV
-                  
-                # here we can place the command that will generate multi-line text
-                # echo $MULTI_LINES_TEXT >> $GITHUB_ENV 
-                echo "MULTI_LINES_TEXT=$(eval ./$command | tail -n1)" >> "$GITHUB_ENV"
-                  
+                echo "VERSION_TEXT<<EOF" >> $GITHUB_ENV
+                echo "VERSION_PACKAGE=$(eval ./$command | tail -n1)" >> "$GITHUB_ENV"
                 echo "EOF" >> $GITHUB_ENV
 
-            - name: parse the output
+            # ---------------------------------------------------------------------------------------
+            #   Debug > Show Version
+            # ---------------------------------------------------------------------------------------
+
+            - name: "Version: Package"
               shell: bash
               run: |
-                echo -e "${{ env.MULTI_LINES_TEXT_ENV_VAR }}"
-                echo -e "${{ env.MULTI_LINES_TEXT }}"
-                echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT_ENV_VAR }}
-                echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT }}
+                echo -e "${{ env.VERSION_PACKAGE }}"
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
             # ---------------------------------------------------------------------------------------
 
             - name: >-
-                📋 Upload Artifacts › opengist-linux-386
-              id: task_build_amd64
+                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-386
+              id: task_build_artifact_i386
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: "opengist-linux-386"
-                path: src/*.deb
+                name: "opengist${{ env.VERSION_PACKAGE }}-linux-386.deb"
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-386*
+                retention-days: 30
+
+            - name: >-
+                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-amd64
+              id: task_build_artifact_amd64
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                name: "opengist${{ env.VERSION_PACKAGE }}-linux-amd64.deb"
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-amd64*
+                retention-days: 30
+
+            - name: >-
+                📋 Upload Artifacts › opengist${{ env.VERSION_PACKAGE }}-linux-arm64
+              id: task_build_artifact_arm64
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                name: "opengist${{ env.VERSION_PACKAGE }}-linux-arm64.deb"
+                path: src/opengist${{ env.VERSION_PACKAGE }}-linux-arm64*
                 retention-days: 30
 
             # ---------------------------------------------------------------------------------------
