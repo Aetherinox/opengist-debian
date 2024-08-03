@@ -75,8 +75,10 @@ jobs:
                   command+=" --skipChangelog"
                 fi
 
-                if [[ ! -z "${{ steps.previoustag.outputs.tag }}" ]]; then
-                  command+=" --current ${{ steps.previoustag.outputs.tag }}"
+                VER_CURRENT=$(echo "${{ steps.previoustag.outputs.tag }}" | sed 's/[v]*//g')
+                
+                if [[ ! -z "${VER_CURRENT}" ]]; then
+                  command+=" --current ${VER_CURRENT}"
                 else
                   echo -e "No version specified, skipping build"
                   exit 1
