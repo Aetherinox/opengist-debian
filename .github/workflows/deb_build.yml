@@ -576,9 +576,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   ${{ steps.task_release_changelog_categorized.outputs.changelog }}
