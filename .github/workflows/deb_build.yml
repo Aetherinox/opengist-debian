@@ -355,7 +355,7 @@ jobs:
               if: always()
               with:
                 name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386*.deb
+                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
                 retention-days: 30
 
             - name: >-
@@ -365,7 +365,7 @@ jobs:
               if: always()
               with:
                 name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64*.deb
+                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
                 retention-days: 30
 
             - name: >-
@@ -375,7 +375,7 @@ jobs:
               if: always()
               with:
                 name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64*.deb
+                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
                 retention-days: 30
 
             # ---------------------------------------------------------------------------------------
@@ -433,7 +433,7 @@ jobs:
               uses: rickstaa/action-create-tag@v1
               id: task_release_tag
               with:
-                tag: v${{ env.PACKAGE_VERSION }}
+                tag: ${{ env.PACKAGE_VERSION }}
                 tag_exists_error: false
                 message: "Latest release"
                 gpg_private_key: ${{ secrets.ADMINSERV_GPG_KEY_ASC }}
@@ -544,8 +544,6 @@ jobs:
 
             - name: "📁 Download › Saved Artifacts"
               uses: actions/download-artifact@v4
-              with:
-                path: ${{ inputs.FOLDER_DIST }}/
 
             # ---------------------------------------------------------------------------------------
             #   Clean dist folder since we're getting the files from artifacts
@@ -578,9 +576,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   ${{ steps.task_release_changelog_categorized.outputs.changelog }}
@@ -600,9 +598,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   > [!WARNING]
