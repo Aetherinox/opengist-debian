@@ -157,12 +157,6 @@ jobs:
 
                 tree
 
-            - name: parse the output
-              shell: bash
-              run: |
-                echo $EXECUTION_OUTPUT
-                echo -e ${{ steps.task_build_run.outputs.EXECUTION_OUTPUT }}
-
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
             # ---------------------------------------------------------------------------------------
