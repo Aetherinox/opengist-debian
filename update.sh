@@ -545,12 +545,6 @@ END_ED
             echo -e "  ${DEVGREY}Version:            ${GREEN}${PKG_VER}${NORMAL}"
 
             # #
-            #   change directory
-            # #
-
-            cd src
-
-            # #
             #   set permissions
             # #
 
@@ -573,4 +567,6 @@ END_ED
             echo -e
 
             rm -rf "build" >> /dev/null 2>&1
+
+            echo ${PKG_VER}
         done

@@ -153,21 +153,28 @@ jobs:
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
 
                 echo -e "Sending command: ${command}"
-                eval "./$command"
+                echo "EXECUTION_OUTPUT=$(eval ./$command)" >> "$GITHUB_ENV"
 
                 tree
+
+            - name: parse the output
+              shell: bash
+              run: |
+                echo $EXECUTION_OUTPUT
+                echo -e ${{ steps.task_build_run.outputs.EXECUTION_OUTPUT }}
+                echo -e ${{ env.EXECUTION_OUTPUT }}
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
             # ---------------------------------------------------------------------------------------
 
             - name: >-
-                📋 Upload Artifacts
-              id: task_test_artifacts_report
+                📋 Upload Artifacts › opengist-linux-386
+              id: task_build_amd64
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: ".deb packages"
+                name: "opengist-linux-386"
                 path: src/*.deb
                 retention-days: 30
 
