@@ -164,7 +164,7 @@ jobs:
                   
                 echo "EOF" >> $GITHUB_ENV
 
-            - name: parse the output
+            - name: parse the outputs
               shell: bash
               run: |
                 echo -e "${{ env.MULTI_LINES_TEXT_ENV_VAR }}"
