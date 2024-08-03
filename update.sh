@@ -538,31 +538,30 @@ END_ED
 
                     gzip --best -n src/$PKG_FOLDER/usr/share/doc/opengist/changelog
                     echo -e "  ${WHITE}Changelog > Zip     ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
-
-                    # #
-                    #   change directory
-                    # #
-                        cd src
-
-                    # #
-                    #   create .deb package
-                    # #
-
-                    echo -e "  ${WHITE}DPKGdeb:            ${GREEN}${PKG_FOLDER}${NORMAL}"
-                    dpkg-deb --root-owner-group --build $PKG_FOLDER
-
-                    # #
-                    #   run lintian
-                    # #
-
-                    echo -e "  ${WHITE}Lintian:            ${GREEN}${PKG_FOLDER}${NORMAL}"
-                    lintian ${$PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
-
             fi
 
             echo -e "  ${DEVGREY}Archive:            ${GREEN}${PKG_ARCHIVE}${NORMAL}"
             echo -e "  ${DEVGREY}Folder:             ${GREEN}${PKG_FOLDER}${NORMAL}"
             echo -e "  ${DEVGREY}Version:            ${GREEN}${PKG_VER}${NORMAL}"
+
+            # #
+            #   change directory
+            # #
+                cd src
+
+            # #
+            #   create .deb package
+            # #
+
+            echo -e "  ${WHITE}DPKGdeb:            ${GREEN}${PKG_FOLDER}${NORMAL}"
+            dpkg-deb --root-owner-group --build $PKG_FOLDER
+
+            # #
+            #   run lintian
+            # #
+
+            echo -e "  ${WHITE}Lintian:            ${GREEN}${PKG_FOLDER}${NORMAL}"
+            lintian ${$PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
 
             echo -e
 
