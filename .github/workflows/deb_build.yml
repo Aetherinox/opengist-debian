@@ -153,9 +153,21 @@ jobs:
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
 
                 echo -e "Sending command: ${command}"
+                # echo "EXECUTION_OUTPUT=$(eval ./$command)" >> "$GITHUB_ENV"
                 eval "./$command"
 
-                tree
+                echo "MULTI_LINES_TEXT_ENV_VAR<<EOF" >> $GITHUB_ENV
+                  
+                # here we can place the command that will generate multi-line text
+                echo $MULTI_LINES_TEXT >> $GITHUB_ENV 
+                  
+                echo "EOF" >> $GITHUB_ENV
+
+            - name: parse the output
+              shell: bash
+              run: |
+                echo -e "${{ env.MULTI_LINES_TEXT_ENV_VAR }}"
+                echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT_ENV_VAR }}
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
