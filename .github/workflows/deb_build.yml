@@ -395,6 +395,7 @@ jobs:
           📦 Build › Release
         env:
           PACKAGE_VERSION: ${{ needs.job-build.outputs.package_version }}
+        needs: [ job-build ]
         runs-on: ubuntu-latest
         permissions:
           contents: write
