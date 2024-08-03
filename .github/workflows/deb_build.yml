@@ -85,7 +85,7 @@ jobs:
                 # make file runnable, might not be necessary
                 chmod +x "${GITHUB_WORKSPACE}/update.sh"
 
-                echo -e "Sending command: ${$command}"
+                echo -e "Sending command: ${command}"
                 eval "./$command"
 
                 tree
