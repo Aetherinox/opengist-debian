@@ -164,22 +164,13 @@ jobs:
                   
                 echo "EOF" >> $GITHUB_ENV
 
-            - name: parse the outputs 1
+            - name: parse the output
               shell: bash
               run: |
-                sha256="$(echo "${{ env.MULTI_LINES_TEXT }}" | tail -n2)"
-                echo "SHA256SUM=${sha256}" >> $GITHUB_ENV
+                echo -e "${{ env.MULTI_LINES_TEXT_ENV_VAR }}"
                 echo -e "${{ env.MULTI_LINES_TEXT }}"
-
-            - name: parse the outputs 22
-              shell: bash
-              run: |
+                echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT_ENV_VAR }}
                 echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT }}
-
-            - name: parse the outputs 3
-              shell: bash
-              run: |
-                echo -e ${{ env.SHA256SUM }}
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
