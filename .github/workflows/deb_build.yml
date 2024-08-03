@@ -168,7 +168,9 @@ jobs:
               shell: bash
               run: |
                 echo -e "${{ env.MULTI_LINES_TEXT_ENV_VAR }}"
+                echo -e "${{ env.MULTI_LINES_TEXT }}"
                 echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT_ENV_VAR }}
+                echo -e ${{ steps.task_build_run.outputs.MULTI_LINES_TEXT }}
 
             # ---------------------------------------------------------------------------------------
             #   Upload artifacts > .deb packages
