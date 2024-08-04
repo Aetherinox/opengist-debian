@@ -498,7 +498,9 @@ jobs:
 
             - name: "📝 Changelog › Build (Categorized)"
               id: task_release_changelog_categorized
-              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, false ) }} || ${{ startsWith( env.SHOW_UNCATEGORIZED, false ) }}
+              if: |
+                startsWith( inputs.SHOW_UNCATEGORIZED, false ) ||
+                startsWith( env.SHOW_UNCATEGORIZED, false )
               uses: mikepenz/release-changelog-builder-action@v4
               with:
                 token: ${{ secrets.ADMINSERV_TOKEN }}
@@ -524,7 +526,9 @@ jobs:
 
             - name: "📝 Changelog › Build (Uncategorized)"
               id: task_release_changelog_uncategorized
-              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, true ) }} || ${{ startsWith( env.SHOW_UNCATEGORIZED, true ) }}
+              if: |
+                startsWith( inputs.SHOW_UNCATEGORIZED, true ) ||
+                startsWith( env.SHOW_UNCATEGORIZED, true )
               uses: mikepenz/release-changelog-builder-action@v4
               with:
                 token: ${{ secrets.ADMINSERV_TOKEN }}
@@ -548,13 +552,17 @@ jobs:
 
             - name: "📝 Changelog › Print (Categorized)"
               id: task_release_changelog_print_categorized
-              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, false ) }} || ${{ startsWith( env.SHOW_UNCATEGORIZED, false ) }}
+              if: |
+                startsWith( inputs.SHOW_UNCATEGORIZED, false ) ||
+                startsWith( env.SHOW_UNCATEGORIZED, false )
               run: |
                 echo "${{ steps.task_release_changelog_categorized.outputs.changelog }}"
 
             - name: "📝 Changelog › Print (Uncategorized)"
               id: task_release_changelog_print_uncategorized
-              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, true ) }} || ${{ startsWith( env.SHOW_UNCATEGORIZED, true ) }}
+              if: |
+                startsWith( inputs.SHOW_UNCATEGORIZED, true ) ||
+                startsWith( env.SHOW_UNCATEGORIZED, true )
               run: |
                 echo "${{ steps.task_release_changelog_uncategorized.outputs.changelog }}"
 
@@ -584,7 +592,9 @@ jobs:
 
             - name: "🏳️ Post › Stable"
               id: task_release_bundle_st
-              if: ${{ startsWith( inputs.PRERELEASE, false ) }} || ${{ startsWith( env.PRERELEASE, false ) }}
+              if: |
+                startsWith( inputs.PRERELEASE, false ) ||
+                startsWith( env.PRERELEASE, false )
               uses: softprops/action-gh-release@v2
               env:
                 GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN_CL }}
@@ -606,7 +616,9 @@ jobs:
 
             - name: "🏳️ Post › Release Candidate"
               id: task_release_bundle_rc
-              if: ${{ startsWith( inputs.PRERELEASE, true ) }} || ${{ startsWith( env.PRERELEASE, true ) }}
+              if: |
+                startsWith( inputs.PRERELEASE, true ) ||
+                startsWith( env.PRERELEASE, true )
               uses: softprops/action-gh-release@v2
               env:
                 GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN }}
