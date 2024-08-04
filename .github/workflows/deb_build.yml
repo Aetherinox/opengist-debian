@@ -1,5 +1,16 @@
+# ---------------------------------------------------------------------------------------
+#   @parent     : github workflow
+#   @desc       : find latest version of Opengist and convert .tar.gz into .deb package
+#   @author     : Aetherinox
+#   @url        : https://github.com/Aetherinox
+# ---------------------------------------------------------------------------------------
+
 name: "📦 .deb › Build"
 run-name: "📦 .deb › Build"
+
+# ---------------------------------------------------------------------------------------
+#   triggers
+# ---------------------------------------------------------------------------------------
 
 on:
   workflow_dispatch:
@@ -243,7 +254,7 @@ jobs:
             #
             #   if no update is available, script exists
             #
-            #   bash script expects a version to be specified as an argument. This version is 
+            #   bash script expects a version to be specified as an argument. This version is
             #   what the latest release is from the Opengist repository. It is then compared to the
             #   latest released within this opengist-debian repo.
             #
