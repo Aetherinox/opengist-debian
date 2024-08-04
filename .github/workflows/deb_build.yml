@@ -107,6 +107,8 @@ on:
         required:     true
         default:      'dist'
         type:         string
+  schedule:
+    - cron: "0 0 * * *"
 
 # ---------------------------------------------------------------------------------------
 #   environment variables
@@ -114,6 +116,13 @@ on:
 
 env:
     PLUGIN_NAME:            opengist
+    CHANGELOG_MODE_COMMIT:  true
+    SHOW_UNCATEGORIZED:     false
+    PRERELEASE:             false
+    VERSION_RC:             '1'
+    EDIT_CHANGELOG:         false
+    FLAG_FORCE:             false
+    FOLDER_DIST:            'dist'
     ASSIGN_USER:            Aetherinox
     BOT_NAME_1:             AdminServ
     BOT_NAME_2:             AdminServX
@@ -283,7 +292,7 @@ jobs:
                 #   the update.sh bash file and edit the CHANGELOG multi-line var
                 # #
 
-                input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG }}
+                input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG || env.EDIT_CHANGELOG }}
                 if [ "${input_EDIT_CHANGELOG}" == "true" ]; then
                   command+=" --skipChangelog"
                 fi
@@ -293,7 +302,7 @@ jobs:
                 #   appends -f, --force to the command
                 # #
 
-                if [ "${{ inputs.FLAG_FORCE }}" == "true" ]; then
+                if [ "${{ inputs.FLAG_FORCE || env.FLAG_FORCE }}" == "true" ]; then
                   command+=" --force"
                 fi
 
@@ -360,33 +369,33 @@ jobs:
             # ---------------------------------------------------------------------------------------
 
             - name: >-
-                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
               id: task_build_artifact_i386
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
+                name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb"
+                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
                 retention-days: 30
 
             - name: >-
-                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
               id: task_build_artifact_amd64
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
+                name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb"
+                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
                 retention-days: 30
 
             - name: >-
-                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
               id: task_build_artifact_arm64
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                name: "${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb"
-                path: src/${{ inputs.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
+                name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb"
+                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
                 retention-days: 30
 
             # ---------------------------------------------------------------------------------------
@@ -489,7 +498,7 @@ jobs:
 
             - name: "📝 Changelog › Build (Categorized)"
               id: task_release_changelog_categorized
-              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, false ) }}
+              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, false ) }} || ${{ startsWith( env.SHOW_UNCATEGORIZED, false ) }}
               uses: mikepenz/release-changelog-builder-action@v4
               with:
                 token: ${{ secrets.ADMINSERV_TOKEN }}
@@ -497,7 +506,7 @@ jobs:
                 #toTag: "${{ github.ref }}"
                 configuration: ".github/changelog-configuration.json"
                 ignorePreReleases: false
-                commitMode: ${{ inputs.CHANGELOG_MODE_COMMIT }}
+                commitMode: ${{ inputs.CHANGELOG_MODE_COMMIT || env.CHANGELOG_MODE_COMMIT }}
                 fetchReleaseInformation: true
                 fetchViaCommits: true
                 configurationJson: |
@@ -515,7 +524,7 @@ jobs:
 
             - name: "📝 Changelog › Build (Uncategorized)"
               id: task_release_changelog_uncategorized
-              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, true ) }}
+              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, true ) }} || ${{ startsWith( env.SHOW_UNCATEGORIZED, true ) }}
               uses: mikepenz/release-changelog-builder-action@v4
               with:
                 token: ${{ secrets.ADMINSERV_TOKEN }}
@@ -523,7 +532,7 @@ jobs:
                 #toTag: "${{ github.ref }}"
                 configuration: ".github/changelog-configuration.json"
                 ignorePreReleases: false
-                commitMode: ${{ inputs.CHANGELOG_MODE_COMMIT }}
+                commitMode: ${{ inputs.CHANGELOG_MODE_COMMIT || env.CHANGELOG_MODE_COMMIT }}
                 fetchReleaseInformation: true
                 fetchViaCommits: true
                 configurationJson: |
@@ -539,13 +548,13 @@ jobs:
 
             - name: "📝 Changelog › Print (Categorized)"
               id: task_release_changelog_print_categorized
-              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, false ) }}
+              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, false ) }} || ${{ startsWith( env.SHOW_UNCATEGORIZED, false ) }}
               run: |
                 echo "${{ steps.task_release_changelog_categorized.outputs.changelog }}"
 
             - name: "📝 Changelog › Print (Uncategorized)"
               id: task_release_changelog_print_uncategorized
-              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, true ) }}
+              if: ${{ startsWith( inputs.SHOW_UNCATEGORIZED, true ) }} || ${{ startsWith( env.SHOW_UNCATEGORIZED, true ) }}
               run: |
                 echo "${{ steps.task_release_changelog_uncategorized.outputs.changelog }}"
 
@@ -575,7 +584,7 @@ jobs:
 
             - name: "🏳️ Post › Stable"
               id: task_release_bundle_st
-              if: ${{ startsWith( inputs.PRERELEASE, false ) }}
+              if: ${{ startsWith( inputs.PRERELEASE, false ) }} || ${{ startsWith( env.PRERELEASE, false ) }}
               uses: softprops/action-gh-release@v2
               env:
                 GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN_CL }}
@@ -587,9 +596,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  ${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   ${{ steps.task_release_changelog_categorized.outputs.changelog }}
@@ -597,7 +606,7 @@ jobs:
 
             - name: "🏳️ Post › Release Candidate"
               id: task_release_bundle_rc
-              if: ${{ startsWith( inputs.PRERELEASE, true ) }}
+              if: ${{ startsWith( inputs.PRERELEASE, true ) }} || ${{ startsWith( env.PRERELEASE, true ) }}
               uses: softprops/action-gh-release@v2
               env:
                 GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN }}
@@ -609,9 +618,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  ${{ inputs.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  ${{ inputs.FOLDER_DIST || env.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  ${{ inputs.FOLDER_DIST || env.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  ${{ inputs.FOLDER_DIST || env.FOLDER_DIST }}/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   > [!WARNING]
