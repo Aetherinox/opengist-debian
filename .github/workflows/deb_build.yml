@@ -236,7 +236,7 @@ jobs:
                 # #
 
                 if [[ ! -z "${VER_RELEASED}" ]]; then
-                  command+=" --available ${VER_RELEASED}"
+                  command+=" --current ${VER_RELEASED}"
                 else
                   echo -e "No version specified, skipping build"
                   exit 1
@@ -318,7 +318,7 @@ jobs:
                 # #
 
                 if [[ ! -z "${VER_RELEASED}" ]]; then
-                  command+=" --available ${VER_RELEASED}"
+                  command+=" --current ${VER_RELEASED}"
                 else
                   echo -e "No version specified, skipping build"
                   exit 1
