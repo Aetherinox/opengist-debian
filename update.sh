@@ -1,6 +1,13 @@
 #!/bin/bash
 PATH="/bin:/usr/bin:/sbin:/usr/sbin:/home/${USER}/bin"
-echo 
+echo
+
+# #
+#   This script relies on the fact that you already have the basic structure set up within the github repo.
+#
+#   The script will download the latest version of Opengist from the official website, but also use the files
+#   within https://github.com/Aetherinox/opengist-debian to create the package.
+# #
 
 # #
 #   vars > colors
@@ -224,26 +231,26 @@ fi
 
 opt_usage()
 {
-    echo -e 
+    echo -e
     printf "  ${BLUE}${app_title}${NORMAL}\n" 1>&2
     printf "  ${GREYL}${app_about}${NORMAL}\n" 1>&2
-    echo -e 
+    echo -e
     printf '  %-5s %-40s\n' "Usage:" "" 1>&2
     printf '  %-5s %-40s\n' "    " "${0} [${GREYL}options${NORMAL}]" 1>&2
-    printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}--skipChangelog${NORMAL}] [${GREYL}--precheck${NORMAL}] [${GREYL}--force${NORMAL}] [${GREYL}--available 1.7.3${NORMAL}] [${GREYL}--version${NORMAL}] [${GREYL}--help${NORMAL}]" 1>&2
+    printf '  %-5s %-40s\n\n' "    " "${0} [${GREYL}--skipChangelog${NORMAL}] [${GREYL}--precheck${NORMAL}] [${GREYL}--force${NORMAL}] [${GREYL}--current 1.7.3${NORMAL}] [${GREYL}--version${NORMAL}] [${GREYL}--help${NORMAL}]" 1>&2
     printf '  %-5s %-40s\n' "Options:" "" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-n, --name" "sets package name" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "" "'${OPT_PACKAGE_NAME}' by default" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-p, --precheck" "check for update and return result. Does not actually update package." 1>&2
-    printf '  %-5s %-24s %-40s\n' "    " "-a, --available" "specifies the available version released" 1>&2
+    printf '  %-5s %-24s %-40s\n' "    " "-a, --current" "specifies the current installed version of opengist" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "" "used in combination with Github Workflow 'github-action-get-previous-tag'" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-s, --skipChangelog" "build package but do not add anything into changelog" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-f, --force" "download and update Opengist no matter what version is installed" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "" "this will re-create every arch for Opengist and make a new .deb package for each" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-v, --version" "current version of this updater" 1>&2
     printf '  %-5s %-24s %-40s\n' "    " "-h, --help" "show this help menu" 1>&2
-    echo -e 
-    echo -e 
+    echo -e
+    echo -e
     exit 1
 }
 
@@ -288,12 +295,12 @@ while [ $# -gt 0 ]; do
             opt_usage
             ;;
 
-    -a*|--available*|--versionAvailable*)
+    -c*|--current*|--currentVer*)
             if [[ "$1" != *=* ]]; then shift; fi
             OPT_VER_CURRENT="${1#*=}"
             if [ -z "${OPT_VER_CURRENT}" ]; then
-                echo -e "  ${NORMAL}Must specify the available version"
-                echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --available 1.7.3${NORMAL}"
+                echo -e "  ${NORMAL}Must specify the current installed version"
+                echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --current 1.7.3${NORMAL}"
                 exit 1
             fi
             ;;
@@ -334,10 +341,10 @@ get_version_compare_gt()
 PKG_VER_CURRENT=$( [[ -n "$OPT_VER_CURRENT" ]] && echo "$OPT_VER_CURRENT" || echo "false"  )
 
 # #
-#   if a available version has been specified.
+#   if a --current version has been specified.
 #   this will be matched against the latest released version.
 #
-#   if no available version has been specified, script will exit
+#   if no --current version has been specified, script will exit
 # #
 
 if [ "${OPT_FORCE}" != "true" ] && ([ -z "${PKG_VER_CURRENT}" ] || [ "${PKG_VER_CURRENT}" == "false" ]); then
@@ -345,11 +352,11 @@ if [ "${OPT_FORCE}" != "true" ] && ([ -z "${PKG_VER_CURRENT}" ] || [ "${PKG_VER_
     echo -e
     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
     echo -e
-    echo -e "  ${BOLD}${ORANGE}WARNING  ${WHITE}Did not specify ${ORANGE}--available${WHITE} to compare with.${NORMAL}"
-    echo -e "  ${BOLD}You must specify ${ORANGE}--available 1.X.X${WHITE} when running the script.${NORMAL}"
+    echo -e "  ${BOLD}${ORANGE}WARNING  ${WHITE}Did not specify ${ORANGE}--current${WHITE} to compare with.${NORMAL}"
+    echo -e "  ${BOLD}You must specify ${ORANGE}--current 1.X.X${WHITE} of Opengist you have installed.${NORMAL}"
     echo -e "  ${BOLD}This is usually done by the Github workflow when it checks for Opengist updates.${NORMAL}"
     echo -e
-    echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --available 1.7.3${NORMAL}"
+    echo -e "      ${BOLD}${DEVGREY}./${app_file_this} --current 1.7.3${NORMAL}"
     echo -e
     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
     echo -e
@@ -369,9 +376,9 @@ rm *.tar.gz* >> /dev/null 2>&1
 #   git > clone
 # #
 
-git clone "${app_repo_url}.git" >> /dev/null 2>&1
-mv ${app_repo_apt}/{.,}* . >> /dev/null 2>&1
-rm -rf ${app_repo_apt} >> /dev/null 2>&1
+#git clone "${app_repo_url}.git" >> /dev/null 2>&1
+#mv ${app_repo_apt}/{.,}* . >> /dev/null 2>&1
+#rm -rf ${app_repo_apt} >> /dev/null 2>&1
 
 # #
 #   list > architectures
@@ -410,7 +417,6 @@ lst_arch=(
             # #
 
             wget $PKG_URL >> /dev/null 2>&1
-            echo -e "  ${WHITE}Download            ${GREEN}${PKG_URL}${NORMAL}"
 
             # #
             #   Assign file names
@@ -420,11 +426,24 @@ lst_arch=(
             PKG_ARCHIVE=($( echo ${PKG_URL} | sed 's:.*/::' ) )
             PKG_VER=($( echo ${PKG_ARCHIVE} | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/' ) )
 
+            echo -e "  ${WHITE}Download            ${GREEN}${PKG_URL}${NORMAL}"
+            echo -e "  ${DEVGREY}Archive:            ${GREEN}${PKG_ARCHIVE}${NORMAL}"
+            echo -e "  ${DEVGREY}Folder:             ${GREEN}${PKG_FOLDER}${NORMAL}"
+            echo -e "  ${DEVGREY}Version:            ${GREEN}${PKG_VER}${NORMAL}"
+
+            echo -e
+            echo -e "  ${DEVGREY}OPT_FORCE:          ${GREEN}${OPT_FORCE}${NORMAL}"
+            echo -e "  ${DEVGREY}OPT_PRECHECK:       ${GREEN}${OPT_PRECHECK}${NORMAL}"
+            echo -e
+
             # #
-            #   version checks are ran if -f, --force are not specified OR -p, --precheck
+            #   run version check if:    -f, --force    = FALSE
+            #   run version check if:    -p, --precheck = TRUE
             # #
 
             if [ "${OPT_FORCE}" != "true" ] || [ "${OPT_PRECHECK}" == "true" ]; then
+
+                echo -e "  ${DEVGREY}Prechecking for update ...${NORMAL}"
 
                 # #
                 #   Check for available update
@@ -434,8 +453,12 @@ lst_arch=(
                 # #
 
                 bUpdateAvailable=$(get_version_compare_gt "${PKG_VER}" "${PKG_VER_CURRENT}" && echo "true" || echo "false")
-                echo -e "Update Available: ${bUpdateAvailable}"
 
+                if [[ "${bUpdateAvailable}" == "false" ]]; then
+                    echo -e "  ${RED}An update was not found${NORMAL}"
+                else
+                    echo -e "  ${GREEN}An update was found${NORMAL}"
+                fi
 
                 # #
                 #   Abort > Both versions are the same
@@ -461,7 +484,7 @@ lst_arch=(
 
                 # #
                 #   Abort > Current version higher than specified version using argument
-                #       '-a, --available, --versionAvailable 1.X.X'
+                #       '-a, --current, --currentVer 1.X.X'
                 # #
 
                 if [[ "${bUpdateAvailable}" == "false" ]]; then
@@ -496,8 +519,8 @@ lst_arch=(
                     echo -e "  ${BOLD}${GREEN}SUCCESS  ${WHITE}An update appears to be available.${NORMAL}"
                     echo -e "  ${BOLD}${WHITE}Run script again without ${GREEN}-p, --precheck${WHITE} to update.${NORMAL}"
                     echo -e
-                    echo -e "      ${YELLOW}RUNNING VERSION${WHITE} > ${YELLOW}${PKG_VER_CURRENT}${NORMAL}"
-                    echo -e "      ${YELLOW}AVAILABLE VERSION${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
+                    echo -e "      ${YELLOW}VERSION - CURRENT    ${WHITE} > ${YELLOW}${PKG_VER_CURRENT}${NORMAL}"
+                    echo -e "      ${YELLOW}VERSION - LATEST     ${WHITE} > ${YELLOW}${PKG_VER}${NORMAL}"
                     echo -e
                     echo -e " ${BLUE}---------------------------------------------------------------------------------------------------${NORMAL}"
                     echo -e
@@ -515,32 +538,240 @@ lst_arch=(
             #   Delete the original .tar.gz files
             # #
 
-            rm ${OPT_PACKAGE_NAME}*.tar.gz >> /dev/null 2>&1
+            # rm ${OPT_PACKAGE_NAME}*.tar.gz >> /dev/null 2>&1
+
+            # #
+            #   Create .deb structure folders
+            #
+            #   these should already be created within the github repo.
+            # #
+
+            mkdir -p src/$PKG_FOLDER/DEBIAN
+            mkdir -p src/$PKG_FOLDER/etc/opengist
+            mkdir -p src/$PKG_FOLDER/lib/systemd/system/
+            mkdir -p src/$PKG_FOLDER/usr/bin/
+            mkdir -p src/$PKG_FOLDER/usr/share/applications/
+            mkdir -p src/$PKG_FOLDER/usr/share/doc/opengist/examples/
+            mkdir -p src/$PKG_FOLDER/usr/share/icons/hicolor/
+            mkdir -p src/$PKG_FOLDER/usr/share/lintian/overrides/
+            mkdir -p src/$PKG_FOLDER/usr/share/man/man1/
+
+            # #
+            #   Create DEBIAN/conffile
+            # #
+
+tee src/$PKG_FOLDER/DEBIAN/conffiles << EOF > /dev/null
+/etc/opengist/config.yml
+EOF
+
+            # #
+            #   Create DEBIAN/control
+            # #
+
+tee src/$PKG_FOLDER/DEBIAN/control << EOF > /dev/null
+Package: opengist
+Version: ${PKG_VER}
+Section: utils
+Priority: optional
+Architecture: ${arch}
+Maintainer: Thomas Miceli <thomiceli@github.com>
+Depends: adduser
+Homepage: https://github.com/Aetherinox/opengist-debian
+Description: Self-hosted pastebin powered by Git, open-source alternative to Github
+ Gist. Opengist is a self-hosted pastebin powered by Git. All snippets are
+ stored in a Git repository and can be read and/or modified using standard Git
+ commands, or with the web interface. It is similar to GitHub Gist, but
+ open-source and could be self-hosted.
+EOF
+
+            # #
+            #   Create /DEBIAN/postinst
+            # #
+
+tee src/$PKG_FOLDER/DEBIAN/postinst << 'EOF' > /dev/null
+#!/bin/sh
+set -e
+
+##--------------------------------------------------------------------------
+#   @author :           aetherinox
+#   @script :           Opengist .deb Package
+#   @when   :           2024-08-02 02:14:53
+#   @url    :           https://github.com/Aetherinox/opengist-debian
+#
+#   There are better ways to do some of this, but unfortunately since we're
+#   not the developer, nor do we have the luxury of adding variables or
+#   ways to seamlessly configure this, we will make do with what we have.
+#
+##--------------------------------------------------------------------------
+
+##--------------------------------------------------------------------------
+#   install desktop shortcut
+##--------------------------------------------------------------------------
+
+for user in /home/*
+do
+    username=${user##*/}
+    path_desktop=${user}//Desktop
+
+    if [ -d "$path_desktop" ]; then
+        cp /usr/share/applications/opengist.desktop $path_desktop
+        chgrp ${username} $path_desktop/opengist.desktop
+        chown ${username} $path_desktop/opengist.desktop
+        chmod 755 $path_desktop/opengist.desktop
+        chmod a+x $path_desktop/opengist.desktop
+    fi
+done
+
+##--------------------------------------------------------------------------
+#   color chart
+##--------------------------------------------------------------------------
+
+ORANGE=$(tput setaf 208)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 156)
+BLUE=$(tput setaf 033)
+MAGENTA=$(tput setaf 5)
+WHITE=$(tput setaf 7)
+GREYL=$(tput setaf 242)
+DEV=$(tput setaf 157)
+DEVGREY=$(tput setaf 243)
+FUCHSIA=$(tput setaf 198)
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
+
+##--------------------------------------------------------------------------
+#   default vars
+##--------------------------------------------------------------------------
+
+OGIST_USER="opengist"
+OGIST_HOME="/var/lib/opengist"
+OGIST_SERV="/etc/systemd/system/opengist.service"
+OGIST_CONF="/etc/opengist/config.yml"
+
+if [ "$1" = "configure" ]; then
+	#	add opengist user/group - will gracefully abort if the user already exists.
+	#	homedir not created
+	set +e
+	adduser --system --home "${OGIST_HOME}" --no-create-home --group "${OGIST_USER}" 2>/dev/null
+	set -e
+
+	#	If the homedir does not already exist, create it with proper
+	#	ownership and permissions.
+	if [ ! -d "${OGIST_HOME}" ]; then
+		mkdir -m 0750 -p "${OGIST_HOME}"
+		chown "${OGIST_USER}:${OGIST_USER}" "${OGIST_HOME}"
+	fi
+fi
+
+echo "Starting service"
+
+if [ -d /run/systemd/system ]; then
+	systemctl daemon-reload >/dev/null || true
+	sleep 5
+
+	if deb-systemd-invoke is-active opengist.service; then
+		deb-systemd-invoke reload opengist.service
+	else
+		deb-systemd-helper enable opengist.service
+		deb-systemd-invoke start opengist.service
+	fi
+fi
+
+printf '\n%-35s\n\n' "  ${BOLD}${DEVGREY}OpenGist Installer${NORMAL}"
+printf '%-35s\n' "  ${BOLD}${WHITE}Opengist has been installed. View the paths below to see where you can${NORMAL}"
+printf '%-35s\n\n' "  ${BOLD}${WHITE}find certain files for configuring Opengist.${NORMAL}"
+printf '%-38s %-40s\n' "  ${WHITE}Database Location${NORMAL}" "${BOLD}${YELLOW}${OGIST_HOME}${NORMAL}"
+printf '%-38s %-40s\n' "  ${WHITE}Config Location${NORMAL}" "${BOLD}${YELLOW}${OGIST_CONF}${NORMAL}"
+printf '%-38s %-40s\n\n' "  ${WHITE}Service Location${NORMAL}" "${BOLD}${YELLOW}${OGIST_SERV}${NORMAL}"
+printf '%-35s\n' "  ${WHITE}The ${BOLD}${YELLOW}opengist.service${NORMAL} will be ran as user ${BOLD}${YELLOW}${OGIST_USER}${NORMAL}."
+printf '%-35s\n\n\n' "  ${WHITE}To change the user, edit the service file and modify ${BOLD}${MAGENTA}USER=$OGIST_USER${NORMAL}"
+EOF
 
             # #
             #   Copy opengist binary file
+            #       build/ > src/
             # #
 
             cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/opengist src/$PKG_FOLDER/usr/bin/opengist >> /dev/null 2>&1
+            echo -e "  ${WHITE}Copy:               ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}/opengist/opengist > ${GREEN}src/$PKG_FOLDER/usr/bin/opengist${NORMAL}"
 
             # #
             #   Copy opengist config.yml
             # #
 
             cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml src/$PKG_FOLDER/etc/opengist/config.yml >> /dev/null 2>&1
+            echo -e "  ${WHITE}Copy:               ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml > ${GREEN}src/$PKG_FOLDER/etc/opengist/config.yml${NORMAL}"
+
             cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml >> /dev/null 2>&1
+            echo -e "  ${WHITE}Copy:               ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml > ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml${NORMAL}"
 
             # #
             #   open 'DEBIAN/control' and change version number
             # #
 
             sed -Ei "s/(Version:) .*/\1 ${PKG_VER}/" src/$PKG_FOLDER/DEBIAN/control >> /dev/null 2>&1
+            echo -e "  ${WHITE}Update Version:     ${GREEN}src/$PKG_FOLDER/DEBIAN/control${NORMAL}"
 
             # #
             #   open 'usr/share/applications/opengist.desktop' and change version number
             # #
 
             sed -Ei "s/(Version=).*/\1${PKG_VER}/" src/$PKG_FOLDER/usr/share/applications/opengist.desktop >> /dev/null 2>&1
+            echo -e "  ${WHITE}Update Version:     ${GREEN}src/$PKG_FOLDER/usr/share/applications/opengist.desktop${NORMAL}"
+
+            # #
+            #   Create /usr/share/applications/opengist.desktop
+            # #
+
+tee src/$PKG_FOLDER/usr/share/applications/opengist.desktop << EOF > /dev/null
+[Desktop Entry]
+Name=Opengist
+GenericName=Opengist
+Version=${PKG_VER}
+Comment=Start Opengist server
+Type=Application
+Icon=opengist
+Categories=Utility;
+Exec=opengist --config "/etc/opengist/config.yml"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+EOF
+
+            # #
+            #   Create /usr/share/lintian/overrides/opengist
+            # #
+
+tee src/$PKG_FOLDER/usr/share/lintian/overrides/opengist << 'EOF' > /dev/null
+opengist: statically-linked-binary [usr/bin/opengist]
+EOF
+
+            # #
+            #   Create /lib/systemd/system/opengist.service
+            # #
+
+tee src/$PKG_FOLDER/lib/systemd/system/opengist.service << 'EOF' > /dev/null
+[Unit]
+Description=Opengist - Host your own Gist
+Documentation=man:opengist(1)
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+User=opengist
+ExecStart=opengist --config=/etc/opengist/config.yml
+Restart=on-failure
+Restart=always
+RestartSec=2s
+TimeoutStopSec=20
+SuccessExitStatus=3 4
+RestartForceExitStatus=3 4
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 
             # #
             #   Skip changelog
@@ -557,6 +788,8 @@ lst_arch=(
 
                     # #
                     #   changelog > decompress
+                    #
+                    #   this requires that you already have a file called changelog.gz which will be extracted.
                     # #
 
                     gunzip src/$PKG_FOLDER/usr/share/doc/opengist/changelog.gz >> /dev/null 2>&1
@@ -589,21 +822,18 @@ END_ED
                     echo -e "  ${WHITE}Changelog > Zip     ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
             fi
 
-            echo -e "  ${DEVGREY}Archive:            ${GREEN}${PKG_ARCHIVE}${NORMAL}"
-            echo -e "  ${DEVGREY}Folder:             ${GREEN}${PKG_FOLDER}${NORMAL}"
-            echo -e "  ${DEVGREY}Version:            ${GREEN}${PKG_VER}${NORMAL}"
-
             # #
             #   set permissions
             # #
 
             sudo chmod 0775 src/${PKG_FOLDER}/DEBIAN/postinst
+            echo -e "  ${WHITE}CHMOD 0775:         ${YELLOW}src/${PKG_FOLDER}/DEBIAN/postinst${NORMAL}"
 
             # #
             #   create .deb package
             # #
 
-            echo -e "  ${WHITE}DPKGdeb:            ${GREEN}${PKG_FOLDER}${NORMAL}"
+            echo -e "  ${WHITE}Create .Deb:        ${YELLOW}src/${PKG_FOLDER}.deb${NORMAL}"
             dpkg-deb --root-owner-group --build src/${PKG_FOLDER}
 
             # #
@@ -615,7 +845,7 @@ END_ED
 
             echo -e
 
-            rm -rf "build" >> /dev/null 2>&1
+            #rm -rf "build" >> /dev/null 2>&1
 
             echo ${PKG_VER}
         done
