@@ -123,7 +123,7 @@ sudo apt install opengist
 Download the latest `.deb` package from this repo's [Releases](https://github.com/Aetherinox/opengist-debian/releases) page. Once downloaded, install it using:
 
 ```shell ignore
-sudo dpkg -i opengist_1.7.3_amd64.deb
+sudo dpkg -i opengist_1.X.X_amd64.deb
 ```
 
 <br />
@@ -193,9 +193,9 @@ The system service will activate the binary in `/usr/bin/opengist`
 To build the debian package, run the following commands within this repo's `src/` folder:
 
 ```shell
-dpkg-deb --root-owner-group --build opengist1.7.3-linux-amd64
-dpkg-deb --root-owner-group --build opengist1.7.3-linux-arm64
-dpkg-deb --root-owner-group --build opengist1.7.3-linux-386
+dpkg-deb --root-owner-group --build opengist1.X.X-linux-amd64
+dpkg-deb --root-owner-group --build opengist1.X.X-linux-arm64
+dpkg-deb --root-owner-group --build opengist1.X.X-linux-386
 ```
 
 <br />
@@ -203,9 +203,9 @@ dpkg-deb --root-owner-group --build opengist1.7.3-linux-386
 Run the linter
 
 ```shell
-lintian opengist1.7.3-linux-amd64.deb --tag-display-limit 0 | grep executable-not-elf
-lintian opengist1.7.3-linux-arm64.deb --tag-display-limit 0 | grep executable-not-elf
-lintian opengist1.7.3-linux-386.deb  --tag-display-limit 0 | grep executable-not-elf
+lintian opengist1.X.X-linux-amd64.deb --tag-display-limit 0 | grep executable-not-elf
+lintian opengist1.X.X-linux-arm64.deb --tag-display-limit 0 | grep executable-not-elf
+lintian opengist1.X.X-linux-386.deb  --tag-display-limit 0 | grep executable-not-elf
 ```
 
 <br />
@@ -221,15 +221,15 @@ This debian package uses the following structure:
 <br />
 
 <details>
-  <summary>opengist1.7.3-linux-amd64</summary>
+  <summary>opengistX.X.X-linux-ARCH</summary>
 
 <br />
 
-File structure / tree for `opengist1.7.3-linux-amd64.deb`
+File structure / tree for `opengistX.X.X-linux-ARCH.deb`
 
 ```shell ignore
 .
-├── opengist1.7.3-linux-amd64
+├── opengistX.X.X-linux-ARCH
 │   ├── DEBIAN
 │   │   ├── conffiles
 │   │   ├── control
@@ -279,141 +279,7 @@ File structure / tree for `opengist1.7.3-linux-amd64.deb`
 │           └── man
 │               └── man1
 │                   └── opengist.1.gz
-└── opengist1.7.3-linux-amd64.deb
-
-30 directories, 21 files
-```
-</details>
-
-<br />
-
-<details>
-  <summary>opengist1.7.3-linux-arm64</summary>
-
-<br />
-
-File structure / tree for `opengist1.7.3-linux-arm64.deb`
-
-```shell ignore
-.
-├── opengist1.7.3-linux-arm64
-│   ├── DEBIAN
-│   │   ├── conffiles
-│   │   ├── control
-│   │   └── postinst
-│   ├── etc
-│   │   └── opengist
-│   │       └── config.yml
-│   ├── lib
-│   │   └── systemd
-│   │       └── system
-│   │           └── opengist.service
-│   └── usr
-│       ├── bin
-│       │   └── opengist
-│       └── share
-│           ├── applications
-│           │   └── opengist.desktop
-│           ├── doc
-│           │   └── opengist
-│           │       ├── AUTHORS
-│           │       ├── changelog.gz
-│           │       ├── copyright
-│           │       ├── examples
-│           │       │   └── config.yaml
-│           │       ├── README
-│           │       └── README.md
-│           ├── icons
-│           │   └── hicolor
-│           │       ├── 128x128
-│           │       │   └── apps
-│           │       │       └── opengist.png
-│           │       ├── 16x16
-│           │       │   └── apps
-│           │       │       └── opengist.png
-│           │       ├── 256x256
-│           │       │   └── apps
-│           │       │       └── opengist.png
-│           │       ├── 32x32
-│           │       │   └── apps
-│           │       │       └── opengist.png
-│           │       └── 64x64
-│           │           └── apps
-│           │               └── opengist.png
-│           ├── lintian
-│           │   └── overrides
-│           │       └── opengist
-│           └── man
-│               └── man1
-│                   └── opengist.1.gz
-└── opengist1.7.3-linux-arm64.deb
-
-30 directories, 21 files
-```
-</details>
-
-<br />
-
-<details>
-  <summary>opengist1.7.3-linux-386</summary>
-
-<br />
-
-File structure / tree for `opengist1.7.3-linux-386.deb`
-
-```shell ignore
-.
-├── opengist1.7.3-linux-386
-│   ├── DEBIAN
-│   │   ├── conffiles
-│   │   ├── control
-│   │   └── postinst
-│   ├── etc
-│   │   └── opengist
-│   │       └── config.yml
-│   ├── lib
-│   │   └── systemd
-│   │       └── system
-│   │           └── opengist.service
-│   └── usr
-│       ├── bin
-│       │   └── opengist
-│       └── share
-│           ├── applications
-│           │   └── opengist.desktop
-│           ├── doc
-│           │   └── opengist
-│           │       ├── AUTHORS
-│           │       ├── changelog.gz
-│           │       ├── copyright
-│           │       ├── examples
-│           │       │   └── config.yaml
-│           │       ├── README
-│           │       └── README.md
-│           ├── icons
-│           │   └── hicolor
-│           │       ├── 128x128
-│           │       │   └── apps
-│           │       │       └── opengist.png
-│           │       ├── 16x16
-│           │       │   └── apps
-│           │       │       └── opengist.png
-│           │       ├── 256x256
-│           │       │   └── apps
-│           │       │       └── opengist.png
-│           │       ├── 32x32
-│           │       │   └── apps
-│           │       │       └── opengist.png
-│           │       └── 64x64
-│           │           └── apps
-│           │               └── opengist.png
-│           ├── lintian
-│           │   └── overrides
-│           │       └── opengist
-│           └── man
-│               └── man1
-│                   └── opengist.1.gz
-└── opengist1.7.3-linux-386.deb
+└── opengistX.X.X-linux-ARCH.deb
 
 30 directories, 21 files
 ```
