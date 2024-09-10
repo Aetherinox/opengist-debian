@@ -7,6 +7,13 @@ echo
 #
 #   The script will download the latest version of Opengist from the official website, but also use the files
 #   within https://github.com/Aetherinox/opengist-debian to create the package.
+#
+#   - base files for opengist are stored in the /template/ folder.
+#   - script will compare version specified by --current <version> and the latest version available through opengist.
+#   - if --current <version> is lesser than the most current version of opengist; an update is found, the .tar.gz files will be downloaded.
+#   - binary files from the downloaded .tar.gz will be extracted and moved over to /src/ folder.
+#   - files from the /template/ folder will then be moved over to /src/ folder. one copy will be added for each arch available. (i386, x64, etc)
+#   - numerous files will be opened and the latest version variable will be replaced with the actual latest version.
 # #
 
 # #
@@ -565,8 +572,8 @@ lst_arch=(
             #   with the actual values needed for the release.
             # #
 
-            cp -r template/usr/share/ src/$PKG_FOLDER/usr/share/ >> /dev/null 2>&1
-            echo -e "  ${WHITE}Copy Template:           ${LIME_YELLOW}template/usr/share/ > ${GREEN}src/$PKG_FOLDER/usr/share/${NORMAL}"
+            cp -r template/usr/share/ src/$PKG_FOLDER/usr/ >> /dev/null 2>&1
+            echo -e "  ${WHITE}Copy Template:           ${LIME_YELLOW}template/usr/share/ > ${GREEN}src/$PKG_FOLDER/usr/${NORMAL}"
 
             # #
             #   Create DEBIAN/conffile
