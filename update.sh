@@ -383,9 +383,9 @@ rm *.tar.gz* >> /dev/null 2>&1
 #   git > clone
 # #
 
-#git clone "${app_repo_url}.git" >> /dev/null 2>&1
-#mv ${app_repo_apt}/{.,}* . >> /dev/null 2>&1
-#rm -rf ${app_repo_apt} >> /dev/null 2>&1
+git clone "${app_repo_url}.git" >> /dev/null 2>&1
+mv ${app_repo_apt}/{.,}* . >> /dev/null 2>&1
+rm -rf ${app_repo_apt} >> /dev/null 2>&1
 
 # #
 #   list > architectures
@@ -545,7 +545,7 @@ lst_arch=(
             #   Delete the original .tar.gz files
             # #
 
-            # rm ${OPT_PACKAGE_NAME}*.tar.gz >> /dev/null 2>&1
+            rm ${OPT_PACKAGE_NAME}*.tar.gz >> /dev/null 2>&1
 
             # #
             #   Create .deb structure folders
@@ -869,7 +869,7 @@ END_ED
 
             echo -e
 
-            #rm -rf "build" >> /dev/null 2>&1
+            rm -rf "build" >> /dev/null 2>&1
 
             echo -e "  ${WHITE}Updating from ${PKG_VER_CURRENT} to ${GREEN}${${PKG_VER}}${NORMAL}"
         done
