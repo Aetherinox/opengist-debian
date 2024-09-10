@@ -532,7 +532,7 @@ lst_arch=(
             # #
 
             mkdir -p build/${OPT_PACKAGE_NAME}-${arch} | tar -xvzf ${PKG_ARCHIVE} -C build/${OPT_PACKAGE_NAME}-${arch} >> /dev/null 2>&1
-            echo -e "  ${WHITE}Extract:            ${GREEN}${PKG_ARCHIVE}${WHITE} > ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}${NORMAL}"
+            echo -e "  ${WHITE}Extract:                 ${GREEN}${PKG_ARCHIVE}${WHITE} > ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}${NORMAL}"
 
             # #
             #   Delete the original .tar.gz files
@@ -557,13 +557,16 @@ lst_arch=(
             mkdir -p src/$PKG_FOLDER/usr/share/man/man1/
 
             # #
-            #   Copy > Template files to arch for opengist
+            #   Copy > Template files from template/usr/share/ to src/$PKG_FOLDER/usr/share/
             #
             #   /usr/share/applications, docs, icons, lintian, man
+            #
+            #   the template files don't always have to be updated. After this copy process, the files will be updated later
+            #   with the actual values needed for the release.
             # #
 
             cp -r template/usr/share/ src/$PKG_FOLDER/usr/share/ >> /dev/null 2>&1
-            echo -e "  ${WHITE}Copy:               ${GREEN}template/usr/share/ > ${GREEN}src/$PKG_FOLDER/usr/share/${NORMAL}"
+            echo -e "  ${WHITE}Copy Template:           ${LIME_YELLOW}template/usr/share/ > ${GREEN}src/$PKG_FOLDER/usr/share/${NORMAL}"
 
             # #
             #   Create DEBIAN/conffile
@@ -702,35 +705,37 @@ EOF
             # #
 
             cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/opengist src/$PKG_FOLDER/usr/bin/opengist >> /dev/null 2>&1
-            echo -e "  ${WHITE}Copy:               ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}/opengist/opengist > ${GREEN}src/$PKG_FOLDER/usr/bin/opengist${NORMAL}"
+            echo -e "  ${WHITE}Copy binary:             ${LIME_YELLOW}build/${OPT_PACKAGE_NAME}-${arch}/opengist/opengist > ${GREEN}src/$PKG_FOLDER/usr/bin/opengist${NORMAL}"
 
             # #
             #   Copy opengist config.yml
             # #
 
             cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml src/$PKG_FOLDER/etc/opengist/config.yml >> /dev/null 2>&1
-            echo -e "  ${WHITE}Copy:               ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml > ${GREEN}src/$PKG_FOLDER/etc/opengist/config.yml${NORMAL}"
+            echo -e "  ${WHITE}Copy config.yml:         ${LIME_YELLOW}build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml > ${GREEN}src/$PKG_FOLDER/etc/opengist/config.yml${NORMAL}"
 
             cp build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml >> /dev/null 2>&1
-            echo -e "  ${WHITE}Copy:               ${GREEN}build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml > ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml${NORMAL}"
+            echo -e "  ${WHITE}Copy config.yml:         ${LIME_YELLOW}build/${OPT_PACKAGE_NAME}-${arch}/opengist/config.yml > ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/examples/config.yaml${NORMAL}"
 
             # #
             #   open 'DEBIAN/control' and change version number
             # #
 
             sed -Ei "s/(Version:) .*/\1 ${PKG_VER}/" src/$PKG_FOLDER/DEBIAN/control >> /dev/null 2>&1
-            echo -e "  ${WHITE}Update Version:     ${GREEN}src/$PKG_FOLDER/DEBIAN/control${NORMAL}"
+            echo -e "  ${WHITE}+w controls:             ${POWDER_BLUE}src/$PKG_FOLDER/DEBIAN/control${NORMAL}"
 
             # #
             #   open 'usr/share/applications/opengist.desktop' and change version number
             # #
 
-            sed -Ei "s/(Version=).*/\1${PKG_VER}/" src/$PKG_FOLDER/usr/share/applications/opengist.desktop >> /dev/null 2>&1
-            echo -e "  ${WHITE}Update Version:     ${GREEN}src/$PKG_FOLDER/usr/share/applications/opengist.desktop${NORMAL}"
+            # sed -Ei "s/(Version=).*/\1${PKG_VER}/" src/$PKG_FOLDER/usr/share/applications/opengist.desktop >> /dev/null 2>&1
+            # echo -e "  ${WHITE}+w opengist.desktop:     ${POWDER_BLUE}src/$PKG_FOLDER/usr/share/applications/opengist.desktop${NORMAL}"
 
             # #
             #   Create /usr/share/applications/opengist.desktop
             # #
+
+            echo -e "  ${WHITE}+w opengist.desktop      ${POWDER_BLUE}src/$PKG_FOLDER/usr/share/applications/opengist.desktop${NORMAL}"
 
 tee src/$PKG_FOLDER/usr/share/applications/opengist.desktop << EOF > /dev/null
 [Desktop Entry]
@@ -751,6 +756,8 @@ EOF
             #   Create /usr/share/lintian/overrides/opengist
             # #
 
+            echo -e "  ${WHITE}+w lintian overrides     ${POWDER_BLUE}src/$PKG_FOLDER/usr/share/lintian/overrides/opengist${NORMAL}"
+
 tee src/$PKG_FOLDER/usr/share/lintian/overrides/opengist << 'EOF' > /dev/null
 opengist: statically-linked-binary [usr/bin/opengist]
 EOF
@@ -758,6 +765,8 @@ EOF
             # #
             #   Create /lib/systemd/system/opengist.service
             # #
+
+            echo -e "  ${WHITE}+w service               ${POWDER_BLUE}src/$PKG_FOLDER/lib/systemd/system/opengist.service${NORMAL}"
 
 tee src/$PKG_FOLDER/lib/systemd/system/opengist.service << 'EOF' > /dev/null
 [Unit]
@@ -801,7 +810,7 @@ EOF
                     # #
 
                     gunzip src/$PKG_FOLDER/usr/share/doc/opengist/changelog.gz >> /dev/null 2>&1
-                    echo -e "  ${WHITE}Changelog > Unzip   ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
+                    echo -e "  ${WHITE}Changelog > Unzip        ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
 
                     # #
                     #   changelog > AMD64 > append to top of file
@@ -820,14 +829,14 @@ ${CHANGELOG}
 wq
 END_ED
 
-                    echo -e "  ${WHITE}Changelog > Change  ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
+                    echo -e "  ${WHITE}Changelog > Change       ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
 
                     # #
                     #   changelog > compress
                     # #
 
                     gzip --best -n src/$PKG_FOLDER/usr/share/doc/opengist/changelog
-                    echo -e "  ${WHITE}Changelog > Zip     ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
+                    echo -e "  ${WHITE}Changelog > Zip          ${GREEN}src/$PKG_FOLDER/usr/share/doc/opengist/changelog${NORMAL}"
             fi
 
             # #
@@ -835,20 +844,20 @@ END_ED
             # #
 
             sudo chmod 0775 src/${PKG_FOLDER}/DEBIAN/postinst
-            echo -e "  ${WHITE}CHMOD 0775:         ${YELLOW}src/${PKG_FOLDER}/DEBIAN/postinst${NORMAL}"
+            echo -e "  ${WHITE}CHMOD 0775:              ${YELLOW}src/${PKG_FOLDER}/DEBIAN/postinst${NORMAL}"
 
             # #
             #   create .deb package
             # #
 
-            echo -e "  ${WHITE}Create .Deb:        ${YELLOW}src/${PKG_FOLDER}.deb${NORMAL}"
+            echo -e "  ${WHITE}Create .Deb:             ${YELLOW}src/${PKG_FOLDER}.deb${NORMAL}"
             dpkg-deb --root-owner-group --build src/${PKG_FOLDER}
 
             # #
             #   run lintian
             # #
 
-            echo -e "  ${WHITE}Lintian:            ${GREEN}${PKG_FOLDER}${NORMAL}"
+            echo -e "  ${WHITE}Lintian:                 ${GREEN}${PKG_FOLDER}${NORMAL}"
             lintian src/${PKG_FOLDER}.deb --tag-display-limit 0 | grep executable-not-elf
 
             echo -e
