@@ -557,6 +557,15 @@ lst_arch=(
             mkdir -p src/$PKG_FOLDER/usr/share/man/man1/
 
             # #
+            #   Copy > Template files to arch for opengist
+            #
+            #   /usr/share/applications, docs, icons, lintian, man
+            # #
+
+            cp -r template/usr/share/ src/$PKG_FOLDER/usr/share/ >> /dev/null 2>&1
+            echo -e "  ${WHITE}Copy:               ${GREEN}template/usr/share/ > ${GREEN}src/$PKG_FOLDER/usr/share/${NORMAL}"
+
+            # #
             #   Create DEBIAN/conffile
             # #
 
@@ -771,7 +780,6 @@ RestartForceExitStatus=3 4
 [Install]
 WantedBy=multi-user.target
 EOF
-
 
             # #
             #   Skip changelog
