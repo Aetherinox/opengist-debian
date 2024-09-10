@@ -120,9 +120,13 @@ sudo apt install opengist
 
 ## Manual
 
-Download the latest `.deb` package from this repo's [Releases](https://github.com/Aetherinox/opengist-debian/releases) page. Once downloaded, install it using:
+Download the latest `.deb` package from this repo's [Releases](https://github.com/Aetherinox/opengist-debian/releases) page. You can download and install it using the commands below.
 
-```shell ignore
+- Replace `ARCH` with `386`, `amd64`, or `arm64`
+- Replace `X.X.X` with the current version. ie: `1.7.4`
+
+```shell
+wget https://github.com/Aetherinox/opengist-debian/releases/download/X.X.X/opengistX.X.X-linux-ARCH.deb
 sudo dpkg -i opengist_1.X.X_amd64.deb
 ```
 
