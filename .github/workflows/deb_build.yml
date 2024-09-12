@@ -693,6 +693,13 @@ jobs:
         steps:
 
             # #
+            #   artifacts > download
+            # #
+
+            - name: "📁 Download › Saved Artifacts"
+              uses: actions/download-artifact@v4
+
+            # #
             #   Job > Complete > Get publish timestamp
             # #
 
@@ -700,6 +707,7 @@ jobs:
               id: task_complete_timestamp_get
               run: |
                 echo "NOW=$(date +'%m-%d-%Y %H:%M:%S')" >> $GITHUB_ENV
+                tree
 
             # #
             #   Job > Complete > Set ENVs
