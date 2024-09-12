@@ -411,7 +411,7 @@ jobs:
                 rm -rf src
                 find . -name "*.tar.gz" -type f -delete
                 tree
-                cat DEBIAN/CONTROL
+                cat template/DEBIAN/control
 
             # ---------------------------------------------------------------------------------------
             #   commit changes
