@@ -345,22 +345,68 @@ jobs:
 
                 # eval "./$command"
 
-            # ---------------------------------------------------------------------------------------
+            # #
             #   Debug > Show Version
-            # ---------------------------------------------------------------------------------------
+            #
+            #   steps.task_build_deb.outputs.PACKAGE_VERSION      Updating from 1.7.4 to 1.7.5
+            #   steps.task_tag_previous.outputs.tag               1.7.4
+            # #
 
             - name: "🗔 Debug: Package Version"
               shell: bash
               run: |
-                echo -e "1 env.PACKAGE_VERSION: ............................ ${{ env.PACKAGE_VERSION }}"
-                echo -e "2 steps.task_build_deb.outputs.PACKAGE_VERSION: ... ${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}"
-                echo -e "3 steps.task_tag_previous.outputs.tag: ............ ${{ steps.task_tag_previous.outputs.tag }}"
+                echo -e "1 steps.task_build_deb.outputs.PACKAGE_VERSION: ... ${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}"
+                echo -e "2 steps.task_tag_previous.outputs.tag: ............ ${{ steps.task_tag_previous.outputs.tag }}"
 
-            # ---------------------------------------------------------------------------------------
+            # #
             #   Debug > Tree
-            # ---------------------------------------------------------------------------------------
+            # #
 
             - name: "🗔 Debug: Tree"
               shell: bash
               run: |
                 tree
+
+            # #
+            #   Upload artifacts > .deb packages
+            # #
+
+            - name: >-
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
+              id: task_build_artifact_i386
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb"
+                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
+                retention-days: 30
+
+            - name: >-
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
+              id: task_build_artifact_amd64
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb"
+                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
+                retention-days: 30
+
+            - name: >-
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
+              id: task_build_artifact_arm64
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb"
+                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
+                retention-days: 30
+
+            # ---------------------------------------------------------------------------------------
+            #   cleanup
+            # ---------------------------------------------------------------------------------------
+
+            - name: "⚙️ Debug › Cleanup"
+              id: task_build_clean
+              run: |
+                rm -rf src
+                find . -name "*.tar.gz" -type f -delete
