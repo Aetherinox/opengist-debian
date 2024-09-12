@@ -871,5 +871,5 @@ END_ED
 
             rm -rf "build" >> /dev/null 2>&1
 
-            echo -e "  ${WHITE}Updating from ${PKG_VER_CURRENT} to ${GREEN}${${PKG_VER}}${NORMAL}"
+            echo -e "  ${WHITE}Updating from ${PKG_VER_CURRENT} to ${GREEN}${PKG_VER}${NORMAL}"
         done
