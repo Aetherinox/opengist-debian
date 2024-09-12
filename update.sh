@@ -872,4 +872,10 @@ END_ED
             rm -rf "build" >> /dev/null 2>&1
 
             echo -e "  ${WHITE}Updating from ${PKG_VER_CURRENT} to ${GREEN}${PKG_VER}${NORMAL}"
+
+            # #
+            #   The last line but be just the version number, this is used in the Github workflow
+            # #
+
+            echo ${PKG_VER}
         done
