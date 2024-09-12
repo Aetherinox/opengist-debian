@@ -335,7 +335,6 @@ jobs:
                 # #
 
                 echo -e "Sending command: ${command}"
-                echo "PACKAGE_VERSION<<EOF"
                 echo "PACKAGE_VERSION<<EOF" >> $GITHUB_OUTPUT
                 echo "$(eval ./$command | tail -n1)" >> "$GITHUB_OUTPUT"
                 echo "EOF" >> $GITHUB_OUTPUT
@@ -353,8 +352,9 @@ jobs:
             - name: "🗔 Debug: Package Version"
               shell: bash
               run: |
-                echo -e "${{ env.PACKAGE_VERSION }}"
-                echo -e "${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}"
+                echo -e "1 env.PACKAGE_VERSION: ............................ ${{ env.PACKAGE_VERSION }}"
+                echo -e "2 steps.task_build_deb.outputs.PACKAGE_VERSION: ... ${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}"
+                echo -e "3 steps.task_tag_previous.outputs.tag: ............ ${{ steps.task_tag_previous.outputs.tag }}"
 
             # ---------------------------------------------------------------------------------------
             #   Debug > Tree
