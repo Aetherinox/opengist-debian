@@ -411,6 +411,7 @@ jobs:
                 rm -rf src
                 find . -name "*.tar.gz" -type f -delete
                 tree
+                cat DEBIAN/CONTROL
 
             # ---------------------------------------------------------------------------------------
             #   commit changes
