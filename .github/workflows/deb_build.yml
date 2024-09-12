@@ -408,12 +408,9 @@ jobs:
             - name: "⚙️ Debug › Cleanup"
               id: task_build_clean
               run: |
-                cp src/${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}/DEBIAN/control template/DEBIAN/control
-                cp src/${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}/usr/share/applications/opengist.desktop template/usr/share/applications/opengist.desktop
                 rm -rf src
                 find . -name "*.tar.gz" -type f -delete
                 tree
-                cat template/DEBIAN/control
 
             # ---------------------------------------------------------------------------------------
             #   commit changes
