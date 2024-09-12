@@ -689,6 +689,8 @@ jobs:
         name: >-
           🆗 Successful Deployment
         needs: [job-build, job-release]
+        env:
+            PACKAGE_VERSION: ${{ needs.job-build.outputs.package_version }}
         runs-on: ubuntu-latest
         steps:
 
