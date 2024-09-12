@@ -411,3 +411,13 @@ jobs:
                 rm -rf src
                 find . -name "*.tar.gz" -type f -delete
                 tree
+
+            # ---------------------------------------------------------------------------------------
+            #   commit changes
+            # ---------------------------------------------------------------------------------------
+
+            - name: "📦 Commit"
+              id: task_build_commit
+              uses: stefanzweifel/git-auto-commit-action@v5
+              with:
+                commit_message: Update opengist binary
