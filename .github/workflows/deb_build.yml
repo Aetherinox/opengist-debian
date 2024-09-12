@@ -348,7 +348,7 @@ jobs:
             # #
             #   Debug > Show Version
             #
-            #   steps.task_build_deb.outputs.PACKAGE_VERSION      Updating from 1.7.4 to 1.7.5
+            #   steps.task_build_deb.outputs.PACKAGE_VERSION      1.7.5
             #   steps.task_tag_previous.outputs.tag               1.7.4
             # #
 
@@ -410,3 +410,4 @@ jobs:
               run: |
                 rm -rf src
                 find . -name "*.tar.gz" -type f -delete
+                tree
