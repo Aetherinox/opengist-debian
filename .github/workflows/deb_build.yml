@@ -378,7 +378,7 @@ jobs:
               if: always()
               with:
                 name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb"
-                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb
+                path: src
                 retention-days: 30
 
             - name: >-
@@ -388,7 +388,7 @@ jobs:
               if: always()
               with:
                 name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb"
-                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
+                path: src
                 retention-days: 30
 
             - name: >-
@@ -398,7 +398,7 @@ jobs:
               if: always()
               with:
                 name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb"
-                path: src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
+                path: src
                 retention-days: 30
 
             # ---------------------------------------------------------------------------------------
@@ -622,9 +622,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   ${{ steps.task_release_changelog_categorized.outputs.changelog }}
@@ -646,9 +646,9 @@ jobs:
                 draft: false
                 generate_release_notes: false
                 files: |
-                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
-                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
-                  ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb
+                  src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                  src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
                 prerelease: false
                 body: |
                   > [!WARNING]
@@ -718,19 +718,19 @@ jobs:
             - name: "🕛 Get Env Vars"
               id: task_complete_set_envs
               run: |
-                deb_386_file="${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb"
+                deb_386_file="src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb"
                 deb_386_sha256="$(shasum --algorithm 256 ${deb_386_file} | awk '{ print $1 }')"
 
                 echo "FILE_DEB_386=${deb_386_file}" >> $GITHUB_ENV
                 echo "SHA_DEB_386=${deb_386_sha256}" >> $GITHUB_ENV
 
-                deb_amd_file="${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb"
+                deb_amd_file="src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb"
                 deb_amd_sha256="$(shasum --algorithm 256 ${deb_amd_file} | awk '{ print $1 }')"
 
                 echo "FILE_DEB_AMD=${deb_amd_file}" >> $GITHUB_ENV
                 echo "SHA_DEB_AMD=${deb_amd_sha256}" >> $GITHUB_ENV
 
-                deb_arm_file="${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb"
+                deb_arm_file="src/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb"
                 deb_arm_sha256="$(shasum --algorithm 256 ${deb_arm_file} | awk '{ print $1 }')"
 
                 echo "FILE_DEB_ARM=${deb_arm_file}" >> $GITHUB_ENV
