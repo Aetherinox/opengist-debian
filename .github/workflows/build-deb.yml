@@ -1,0 +1,797 @@
+# #
+#   @parent     : github workflow
+#   @desc       : find latest version of Opengist and convert .tar.gz into .deb package
+#   @author     : Aetherinox
+#   @url        : https://github.com/Aetherinox
+# #
+
+name: "📦 .deb › Build"
+run-name: "📦 .deb › Build"
+
+# #
+#   triggers
+# #
+
+on:
+
+    # #
+    #   Sched (crons)
+    # #
+
+    schedule:
+        - cron: '0 0 * * *'
+
+    workflow_dispatch:
+        inputs:
+
+          # #
+          #   Name of the plugin to use when creating the release zip filename
+          #       e.g: opengist-v1.10.0.zip
+          # #
+
+          PLUGIN_NAME:
+            description:    '📦 Name of Plugin'
+            required:       true
+            default:        'opengist'
+            type:           string
+
+          # #
+          #   enable        the changelog generated in releases tab will only display single commits.
+          #   disable       the changelog shows pull requests completed based on their labels
+          # #
+
+          CHANGELOG_MODE_COMMIT:
+            description:    '📑 Use Commits Instead of PRs'
+            required:       true
+            default:        true
+            type:           boolean
+
+          # #
+          #   enable        will show all types of commits, including uncategorized
+          #   disable       wIll only show actions that have been categorized using the format
+          #                       type(scope): description
+          #                       type: description
+          # #
+
+          SHOW_UNCATEGORIZED:
+            description:    '🗂️ Show Uncategorized Commits'
+            required:       true
+            default:        false
+            type:           boolean
+
+          # #
+          #   enable        released version will be marked as pre-release
+          #   disable       release version will be marked as stable / normal release
+          # #
+
+          PRERELEASE:
+            description:    '🧪 Build RC (Pre-release)'
+            required:       true
+            default:        false
+            type:           boolean
+
+          # #
+          #   Release Candidate version number
+          #   this will be added to the end of your released app in the releases page.
+          #       e.g: opengist-v1.10.0-rc.1
+          # #
+
+          VERSION_RC:
+            description:    '🧪 RC (Pre-release) Ver (opengist-rc.v1)'
+            required:       false
+            type:           string
+            default:        '1'
+
+          # #
+          #   enable        Anything in the bash script's CHANGELOG variable will be appended to
+          #                     the top of the debian package's changelog file.
+          #   disable       debian package changelog will not be edited.
+          # #
+
+          EDIT_CHANGELOG:
+            description:    '🗂️ Dont Edit Changelog'
+            required:       true
+            default:        true
+            type:           boolean
+
+          # #
+          #   enable        forces all packages to be re-created
+          #   disable       packages will only be created if update to Opengist is available
+          # #
+
+          FLAG_FORCE:
+            description:    '🗂️ Force'
+            required:       true
+            default:        false
+            type:           boolean
+
+          # #
+          #   Dist Folder
+          #   This is where the final artifacts will be placed before generating a ZIP
+          # #
+
+          FOLDER_DIST:
+            description:    '📁 Folder: Dist'
+            required:       true
+            default:        'dist'
+            type:           string
+
+# #
+#   environment variables
+# #
+
+env:
+    PLUGIN_NAME:            ${{ github.event.inputs.PLUGIN_NAME || 'opengist' }}
+    CHANGELOG_MODE_COMMIT:  ${{ github.event.inputs.CHANGELOG_MODE_COMMIT || true }}
+    SHOW_UNCATEGORIZED:     ${{ github.event.inputs.SHOW_UNCATEGORIZED || false }}
+    PRERELEASE:             ${{ github.event.inputs.PRERELEASE || false }}
+    VERSION_RC:             ${{ github.event.inputs.VERSION_RC || '1' }}
+    EDIT_CHANGELOG:         ${{ github.event.inputs.EDIT_CHANGELOG || false }}
+    FLAG_FORCE:             ${{ github.event.inputs.FLAG_FORCE || false }}
+    FOLDER_DIST:            ${{ github.event.inputs.FOLDER_DIST || 'dist' }}
+    ASSIGN_USER:            Aetherinox
+    BOT_NAME_1:             EuropaServ
+    BOT_NAME_2:             BinaryServ
+    BOT_NAME_DEPENDABOT:    dependabot[bot]
+
+# #
+#   jobs
+# #
+
+jobs:
+
+    # #
+    #   JOB > INITIALIZE
+    # #
+
+    job-build:
+        name: >-
+            📦 Build › Package
+        runs-on: ubuntu-latest
+        outputs:
+            package_version: ${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}
+        permissions:
+            contents: write
+            packages: write
+        steps:
+
+            # #
+            #   Job > Start
+            # #
+
+            - name: '✅ Start'
+              id: task_build_start
+              run: |
+                  echo 'Starting build'
+
+            # #
+            #   Job > Checkout
+            # #
+
+            - name: '☑️ Checkout'
+              id: task_build_checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            # #
+            #   Job > Get Previous Tag
+            # #
+
+            - name: '🏷️ Get Previous tag'
+              id: task_tag_previous
+              uses: WyriHaximus/github-action-get-previous-tag@v1
+              with:
+                  fallback: 1.10.0
+
+            # #
+            #   Job > Print Current Version
+            # #
+
+            - name: '🔨 Print Current Version'
+              id: task_build_getver
+              run: |
+                  echo -e ${{ steps.task_tag_previous.outputs.tag }}
+
+            # #
+            #   precheck
+            # #
+
+            - name: '🔨 Install Packages'
+              id: task_build_install
+              run: |
+
+                  # #
+                  #   install packages
+                  # #
+
+                  sudo apt install tree
+                  sudo apt install lintian
+
+            # #
+            #   precheck
+            #
+            #   checks the Opengist repo to see if a newer version of Opengist has been released.
+            #   will then return whether an update is available or not and then exit.
+            #
+            #   @example    : ./update.sh -c 1.9.1 --precheck
+            # #
+
+            - name: '🔨 Build › Precheck'
+              id: task_build_precheck
+              run: |
+
+                  echo -e "Starting Precheck for new Opengist updates"
+
+                  # #
+                  #   base command
+                  # #
+
+                  command="update.sh --precheck --workflow"
+
+                  # #
+                  #   Get current version released from Github repo tags
+                  # #
+
+                  VER_CURRENT=$(echo "${{ steps.task_tag_previous.outputs.tag }}" | sed 's/[v]*//g')
+
+                  # #
+                  #   If current tag exists, pass the latest tag version
+                  #   over to bash script
+                  # #
+
+                  if [[ ! -z "${VER_CURRENT}" ]]; then
+                      command+=" --current ${VER_CURRENT}"
+                  else
+                      echo -e "No version specified, skipping build"
+                      exit 1
+                  fi
+
+                  # #
+                  #   permissions
+                  # #
+
+                  chmod +x "${GITHUB_WORKSPACE}/update.sh"
+
+                  # #
+                  #   save output of bash script to env var
+                  # #
+
+                  echo -e "Sending command: ${command}"
+                  echo "PRECHECK_RESULT<<EOF" >> $GITHUB_OUTPUT
+                  echo "$(eval ./$command | tail -n1)" >> "$GITHUB_OUTPUT"
+                  echo "EOF" >> $GITHUB_OUTPUT
+
+            # #
+            #   Abort workflow if update not available
+            # #
+
+            - name: '❌ Abort Build'
+              id: task_build_abort
+              if: steps.task_build_precheck.outputs.PRECHECK_RESULT == 'abort'
+              run: |
+                  echo -e "Aborting Run; no updated version available"
+                  gh run cancel ${{ github.run_id }}
+                  gh run watch ${{ github.run_id }}
+              env:
+                  GH_TOKEN: ${{ secrets.SELF_TOKEN_CL }}
+
+            # #
+            #   Run update.sh bash script
+            #
+            #   gets the most current tag released and compares it to the latest version of
+            #   opengist available.
+            #
+            #   if no update is available, script exists
+            #
+            #   bash script expects a version to be specified as an argument. This version is
+            #   what the latest release is from the Opengist repository. It is then compared to the
+            #   latest released within this opengist-debian repo.
+            #
+            #   @example    : ./update.sh -c 1.9.1
+            #                 ./update.sh -c 1.9.1 --precheck
+            # #
+
+            - name: "🔨 Build › .deb"
+              id: task_build_deb
+              if: steps.task_build_abort.outcome == 'skipped'
+              run: |
+
+                  echo -e "Precheck successful, downloading update for Opengist"
+
+                  # #
+                  #   base command
+                  # #
+
+                  command="update.sh"
+
+                  # #
+                  #   Input > skip changelog
+                  #   appends -s, --skipChangelog to the command
+                  #
+                  #   if you want to add your own changelog entry, you must open
+                  #   the update.sh bash file and edit the CHANGELOG multi-line var
+                  # #
+
+                  input_EDIT_CHANGELOG=${{ inputs.EDIT_CHANGELOG || env.EDIT_CHANGELOG }}
+                  if [ "${input_EDIT_CHANGELOG}" == "true" ]; then
+                      command+=" --skipChangelog"
+                  fi
+
+                  # #
+                  #   Input > Force
+                  #   appends -f, --force to the command
+                  # #
+
+                  if [ "${{ inputs.FLAG_FORCE || env.FLAG_FORCE }}" == "true" ]; then
+                      command+=" --force"
+                  fi
+
+                  # #
+                  #   Get current version released from Github repo tags
+                  # #
+
+                  VER_CURRENT=$(echo "${{ steps.task_tag_previous.outputs.tag }}" | sed 's/[v]*//g')
+
+                  # #
+                  #   If current tag exists, pass the latest tag version
+                  #   over to bash script
+                  # #
+
+                  if [[ ! -z "${VER_CURRENT}" ]]; then
+                      command+=" --current ${VER_CURRENT}"
+                  else
+                      echo -e "No version specified, skipping build"
+                      exit 1
+                  fi
+
+                  # #
+                  #   permissions
+                  # #
+
+                  chmod +x "${GITHUB_WORKSPACE}/update.sh"
+
+                  # #
+                  #   save output of bash script to env var
+                  # #
+
+                  echo -e "Sending command: ${command}"
+                  echo "PACKAGE_VERSION<<EOF" >> $GITHUB_OUTPUT
+                  echo "$(eval ./$command | tail -n1)" >> "$GITHUB_OUTPUT"
+                  echo "EOF" >> $GITHUB_OUTPUT
+
+                  # #
+                  #   old run command
+                  # #
+
+                  # eval "./$command"
+
+            # #
+            #   Debug > Show Version
+            #
+            #   steps.task_build_deb.outputs.PACKAGE_VERSION      1.7.5
+            #   steps.task_tag_previous.outputs.tag               1.7.4
+            # #
+
+            - name: "🗔 Debug: Package Version"
+              shell: bash
+              run: |
+                  echo -e "1 steps.task_build_deb.outputs.PACKAGE_VERSION: ... ${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}"
+                  echo -e "2 steps.task_tag_previous.outputs.tag: ............ ${{ steps.task_tag_previous.outputs.tag }}"
+
+            # #
+            #   Debug > Tree
+            # #
+
+            - name: "🗔 Debug: Tree"
+              shell: bash
+              run: |
+                  echo -e "------------------------------------------------------"
+                  echo -e "Current Working Directory:     $PWD"
+                  echo -e "------------------------------------------------------"
+                  tree
+
+            # #
+            #   Upload artifacts > .deb packages
+            # #
+
+            - name: >-
+                  📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb
+              id: task_build_artifact_amd64
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-amd64.deb"
+                  path: src
+                  retention-days: 30
+
+            - name: >-
+                📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb
+              id: task_build_artifact_arm64
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-arm64.deb"
+                  path: src
+                  retention-days: 30
+
+            - name: >-
+                  📋 Upload Artifacts › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb
+              id: task_build_artifact_i386
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb"
+                  path: src
+                  retention-days: 30
+
+            # #
+            #   cleanup
+            # #
+
+            - name: "⚙️ Debug › Cleanup"
+              id: task_build_clean
+              run: |
+                  echo -e "------------------------------------------------------"
+                  echo -e "Cleaning up folder:     src"
+                  echo -e "------------------------------------------------------"
+
+                  rm -rf "src"
+
+                  echo -e "------------------------------------------------------"
+                  echo -e "Deleting .tar.gz files"
+                  echo -e "------------------------------------------------------"
+
+                  find . -name "*.tar.gz" -type f -delete
+
+                  echo -e "------------------------------------------------------"
+                  echo -e "Current Working Directory:     $PWD"
+                  echo -e "------------------------------------------------------"
+                  tree
+
+            # #
+            #   commit changes
+            # #
+
+            - name: "📦 Commit"
+              id: task_build_commit
+              uses: stefanzweifel/git-auto-commit-action@v5
+              with:
+                  commit_message: Update opengist binary
+
+    # #
+    #   Job > Release
+    # #
+
+    job-release:
+        name: >-
+            📦 Build › Release
+        runs-on: ubuntu-latest
+        needs: [ job-build ]
+        env:
+            PACKAGE_VERSION: ${{ needs.job-build.outputs.package_version }}
+        permissions:
+            contents: write
+            packages: write
+        steps:
+
+            # #
+            #   Dist Releases > Checkout
+            # #
+
+            - name: "☑️ Checkout"
+              uses: actions/checkout@v4
+              id: task_release_checkout
+              with:
+                  fetch-depth: 0
+
+            # #
+            #   Debug : View passed values
+            # #
+
+            - name: "⚙️ Debug › Passed Values"
+              id: task_release_debug_print_vals_1
+              run: |
+                  echo "VERSION ............. ${{ env.PACKAGE_VERSION }}"
+
+            # #
+            #   [ Tag ]: Pre Create
+            #
+            #   in order to use the changelog github action, you must pre-create the tag otherwise
+            #   the changelog action will have no idea what tag you are going to be creating and
+            #   the list of commits will not be for the correct release.
+            # #
+
+            - name: "🔖 Tag › Pre Create ${{ env.PACKAGE_VERSION }}"
+              uses: rickstaa/action-create-tag@v1
+              id: task_release_tag
+              with:
+                  tag: ${{ env.PACKAGE_VERSION }}
+                  tag_exists_error: false
+                  message: "Latest release"
+                  gpg_private_key: ${{ secrets.ADMINSERV_GPG_KEY_ASC }}
+                  gpg_passphrase: ${{ secrets.ADMINSERV_GPG_PASSPHRASE }}
+
+            # #
+            #   [ Tag ]: Confirm
+            # #
+
+            - name: "🔖 Tag › Confirm ${{ env.PACKAGE_VERSION }}"
+              run: |
+                  echo "Tag already present: ${{ env.TAG_EXISTS }}"
+                  echo "Tag already present: ${{ steps.task_release_tag.outputs.tag_exists }}"
+
+            # #
+            #   Contributor Images
+            # #
+
+            - name: "🥸 Contributors › Generate"
+              id: task_release_contribs_generate
+              uses: jaywcjlove/github-action-contributors@main
+              with:
+                  filter-author: (renovate\[bot\]|renovate-bot|dependabot\[bot\])
+                  output: CONTRIBUTORS.svg
+                  avatarSize: 42
+
+            # #
+            #   Generate Changelog
+            #
+            #   generates a changelog from the github api. requires a PREVIOUS_TAG in order to figure
+            #   out the changes made between the two versions.
+            #
+            #   outputs:
+            #     ${{ steps.changelog.outputs.changelog }}
+            # #
+
+            - name: "📝 Changelog › Pre Setup (Categorized Commits)"
+              id: task_release_changelog_commits_tags_print
+              run: |
+                  echo "TAG_LAST=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+                  echo "COMMIT_LAST=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+            - name: "📝 Changelog › Build (Categorized)"
+              id: task_release_changelog_categorized
+              if: |
+                  startsWith( inputs.SHOW_UNCATEGORIZED, false ) ||
+                  startsWith( env.SHOW_UNCATEGORIZED, false )
+              uses: mikepenz/release-changelog-builder-action@v5
+              with:
+                  token: ${{ secrets.ADMINSERV_TOKEN }}
+                  # fromTag: "${{ env.TAG_LAST }}"
+                  # toTag: "${{ github.ref }}"
+                  configuration: ".github/changelog-configuration.json"
+                  ignorePreReleases: false
+                  commitMode: ${{ inputs.CHANGELOG_MODE_COMMIT || env.CHANGELOG_MODE_COMMIT }}
+                  fetchReleaseInformation: true
+                  fetchViaCommits: true
+                  configurationJson: |
+                    {
+                      "template": "## Release Info \n| Item | Value |\n| --- | --- |\n|<sub>Stamp</sub>|<sub>`#{{FROM_TAG}}-#{{FROM_TAG_DATE}} 🔺 #{{TO_TAG}}-#{{TO_TAG_DATE}}`</sub>|\n|<sub>Last Release</sub>|<sub>`#{{DAYS_SINCE}} days ago`</sub>|\n\n<br>\n\n---\n\n<br>\n\n### What's New\nThis release contains the following changes:\n\n<br>\n\n---\n\n<br>\n\n### Statistics\nHow the files have changed:\n<ul><li><a href='#{{RELEASE_DIFF}}'>Changed files</a>  : <b>#{{CHANGED_FILES}}</b> </li><li>Changes  : <b>#{{CHANGES}}</b> </li><li>Commits : <b>#{{COMMITS}}</b> </li><li>Additions : <b>#{{ADDITIONS}}</b></li><li>Deletions : <b>#{{DELETIONS}}</b></li><li>PRs (categorized) : <b>#{{CATEGORIZED_COUNT}}</b></li><li>PRs (uncategorized) : <b>#{{UNCATEGORIZED_COUNT}}</b></li><li>PRs (open) : <b>#{{OPEN_COUNT}}</b></li>\n<br />\n</ul>\n\n<br>\n\n---\n\n<br>\n\n### Pull Requests\nThis release is associated with the following pull requests:\n#{{CHANGELOG}}\n\n<br>\n\n---\n\n<br>\n\n"
+                    }
+              env:
+                  GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN }}
+
+            # #
+            #   shows only categorized commits using the commit standards
+            #                type(scope): description
+            #                type: description
+            # #
+
+            - name: "📝 Changelog › Build (Uncategorized)"
+              id: task_release_changelog_uncategorized
+              if: |
+                  startsWith( inputs.SHOW_UNCATEGORIZED, true ) ||
+                  startsWith( env.SHOW_UNCATEGORIZED, true )
+              uses: mikepenz/release-changelog-builder-action@v5
+              with:
+                  token: ${{ secrets.ADMINSERV_TOKEN }}
+                  # fromTag: "${{ env.TAG_LAST }}"
+                  # toTag: "${{ github.ref }}"
+                  configuration: ".github/changelog-configuration.json"
+                  ignorePreReleases: false
+                  commitMode: ${{ inputs.CHANGELOG_MODE_COMMIT || env.CHANGELOG_MODE_COMMIT }}
+                  fetchReleaseInformation: true
+                  fetchViaCommits: true
+                  configurationJson: |
+                    {
+                      "template": "## Release Info \n| Item | Value |\n| --- | --- |\n|<sub>Stamp</sub>|<sub>`#{{FROM_TAG}}-#{{FROM_TAG_DATE}} 🔺 #{{TO_TAG}}-#{{TO_TAG_DATE}}`</sub>|\n|<sub>Last Release</sub>|<sub>`#{{DAYS_SINCE}} days ago`</sub>|\n\n<br>\n\n---\n\n<br>\n\n### What's New\nThis release contains the following changes:\n\n<br>\n\n---\n\n<br>\n\n### Statistics\nHow the files have changed:\n<ul><li><a href='#{{RELEASE_DIFF}}'>Changed files</a>  : <b>#{{CHANGED_FILES}}</b> </li><li>Changes  : <b>#{{CHANGES}}</b> </li><li>Commits : <b>#{{COMMITS}}</b> </li><li>Additions : <b>#{{ADDITIONS}}</b></li><li>Deletions : <b>#{{DELETIONS}}</b></li><li>PRs (categorized) : <b>#{{CATEGORIZED_COUNT}}</b></li><li>PRs (uncategorized) : <b>#{{UNCATEGORIZED_COUNT}}</b></li><li>PRs (open) : <b>#{{OPEN_COUNT}}</b></li>\n<br />\n</ul>\n\n<br>\n\n---\n\n<br>\n\n### Pull Requests\nThis release is associated with the following pull requests:\n#{{CHANGELOG}}\n\n<br>\n\n"
+                    }
+              env:
+                  GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN }}
+
+            # #
+            #   Fetch Changelog
+            # #
+
+            - name: "📝 Changelog › Print (Categorized)"
+              id: task_release_changelog_print_categorized
+              if: |
+                  startsWith( inputs.SHOW_UNCATEGORIZED, false ) ||
+                  startsWith( env.SHOW_UNCATEGORIZED, false )
+              run: |
+                  echo "${{ steps.task_release_changelog_categorized.outputs.changelog }}"
+
+            - name: "📝 Changelog › Print (Uncategorized)"
+              id: task_release_changelog_print_uncategorized
+              if: |
+                  startsWith( inputs.SHOW_UNCATEGORIZED, true ) ||
+                  startsWith( env.SHOW_UNCATEGORIZED, true )
+              run: |
+                  echo "${{ steps.task_release_changelog_uncategorized.outputs.changelog }}"
+
+            # #
+            #   artifacts > download
+            # #
+
+            - name: "📁 Download › Saved Artifacts"
+              uses: actions/download-artifact@v4
+              with:
+                  path: ./
+
+            # #
+            #   Clean dist folder since we're getting the files from artifacts
+            # #
+
+            - name: "⚙️ Debug › Clean Dist Folder"
+              run: |
+                  echo -e "------------------------------------------------------"
+                  echo -e "Current Working Directory:     $PWD"
+                  echo -e "------------------------------------------------------"
+                  tree
+
+            # #
+            #   [ Release ]: Post Release
+            #
+            #   outputs:
+            #     [RELEASE ID]:
+            #       ${{ steps.task_release_bundle_rc.outputs.id
+            #       ${{ steps.task_release_bundle_st.outputs.id
+            # #
+
+            - name: "🏳️ Post › Stable"
+              id: task_release_bundle_st
+              if: |
+                  startsWith( inputs.PRERELEASE, false ) ||
+                  startsWith( env.PRERELEASE, false )
+              uses: softprops/action-gh-release@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN_CL }}
+              with:
+                  token: ${{ secrets.ADMINSERV_TOKEN_CL }}
+                  name: v${{ env.PACKAGE_VERSION }}
+                  tag_name: ${{ env.PACKAGE_VERSION }}
+                  target_commitish: ${{ github.event.inputs.branch }}
+                  draft: false
+                  generate_release_notes: false
+                  files: |
+                      ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb
+                      ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                      ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  prerelease: false
+                  body: |
+                      ${{ steps.task_release_changelog_categorized.outputs.changelog }}
+                      ${{ steps.task_release_changelog_uncategorized.outputs.changelog }}
+
+            - name: "🏳️ Post › Release Candidate"
+              id: task_release_bundle_rc
+              if: |
+                  startsWith( inputs.PRERELEASE, true ) ||
+                  startsWith( env.PRERELEASE, true )
+              uses: softprops/action-gh-release@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN }}
+              with:
+                  token: ${{ secrets.ADMINSERV_TOKEN }}
+                  name: v${{ env.PACKAGE_VERSION }}
+                  tag_name: ${{ env.PACKAGE_VERSION }}
+                  target_commitish: ${{ github.event.inputs.branch }}
+                  draft: false
+                  generate_release_notes: false
+                  files: |
+                      ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb
+                      ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb
+                      ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb
+                  prerelease: false
+                  body: |
+                      > [!WARNING]
+                      > This is a **release candidate**, which means it is not a stable release and could contain bugs. You should download it at your own risk.
+
+                      ${{ steps.task_release_changelog_categorized.outputs.changelog }}
+                      ${{ steps.task_release_changelog_uncategorized.outputs.changelog }}
+
+            # #
+            #   Print Status
+            # #
+
+            - name: "🎛️ Status › Print"
+              id: task_release_status_print
+              run: |
+                  echo "Printing Variables"
+                  echo
+                  echo "---- CHANGELOG ---------------------------------------------------------------"
+                  echo "${{ steps.task_release_changelog_categorized.outputs.changelog }}"
+                  echo "${{ steps.task_release_changelog_uncategorized.outputs.changelog }}"
+                  echo "---- CHANGELOG ---------------------------------------------------------------"
+                  echo ""
+                  echo ""
+                  echo "---- VARIABLES ---------------------------------------------------------------"
+                  echo "Package Version ............ ${{ env.PACKAGE_VERSION }}"
+                  echo "Tag: Previous .............. ${{ env.TAG_LAST }}"
+                  echo "Tag: Now.... ............... ${{ github.ref }}"
+                  echo "Last Commit ................ ${{ env.COMMIT_LAST }}"
+                  echo "ST Output ID ............... ${{ steps.task_release_bundle_st.outputs.id }}"
+                  echo "RC Output ID ............... ${{ steps.task_release_bundle_rc.outputs.id }}"
+                  echo "---- CHANGELOG ---------------------------------------------------------------"
+
+    # #
+    #   JOB > COMPLETE
+    # #
+
+    job-complete:
+        name: >-
+            🆗 Successful Deployment
+        needs: [job-build, job-release]
+        env:
+            PACKAGE_VERSION: ${{ needs.job-build.outputs.package_version }}
+        runs-on: ubuntu-latest
+        steps:
+
+            # #
+            #   artifacts > download
+            # #
+
+            - name: "📁 Download › Saved Artifacts"
+              uses: actions/download-artifact@v4
+
+            # #
+            #   Job > Complete > Get publish timestamp
+            # #
+
+            - name: "🕛 Get Timestamp"
+              id: task_complete_timestamp_get
+              run: |
+                  echo "NOW=$(date +'%m-%d-%Y %H:%M:%S')" >> $GITHUB_ENV
+                  echo -e "------------------------------------------------------"
+                  echo -e "Current Working Directory:     $PWD"
+                  echo -e "------------------------------------------------------"
+                  tree
+
+            # #
+            #   Job > Complete > Set ENVs
+            # #
+
+            - name: "🕛 Get Env Vars"
+              id: task_complete_set_envs
+              run: |
+                  deb_386_file="${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb"
+                  deb_386_sha256="$(shasum --algorithm 256 ${deb_386_file} | awk '{ print $1 }')"
+
+                  echo "FILE_DEB_386=${deb_386_file}" >> $GITHUB_ENV
+                  echo "SHA_DEB_386=${deb_386_sha256}" >> $GITHUB_ENV
+
+                  deb_amd_file="${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-amd64.deb"
+                  deb_amd_sha256="$(shasum --algorithm 256 ${deb_amd_file} | awk '{ print $1 }')"
+
+                  echo "FILE_DEB_AMD=${deb_amd_file}" >> $GITHUB_ENV
+                  echo "SHA_DEB_AMD=${deb_amd_sha256}" >> $GITHUB_ENV
+
+                  deb_arm_file="${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-arm64.deb"
+                  deb_arm_sha256="$(shasum --algorithm 256 ${deb_arm_file} | awk '{ print $1 }')"
+
+                  echo "FILE_DEB_ARM=${deb_arm_file}" >> $GITHUB_ENV
+                  echo "SHA_DEB_ARM=${deb_arm_sha256}" >> $GITHUB_ENV
+
+            # #
+            #   Job > Complete > Summary of publish
+            # #
+
+            - name: "🆗 Completed: ${{ env.NOW }}"
+              id: task_complete_summary
+              run: |
+                  echo ""
+                  echo ""
+                  echo "| File                            | SHA256                  |" >> $GITHUB_STEP_SUMMARY
+                  echo "| ------------------------------- | ----------------------- |" >> $GITHUB_STEP_SUMMARY
+                  echo "| **${{ env.FILE_DEB_386 }}**       | ${{ env.SHA_DEB_386 }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| **${{ env.FILE_DEB_AMD }}**       | ${{ env.SHA_DEB_AMD }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| **${{ env.FILE_DEB_ARM }}**       | ${{ env.SHA_DEB_ARM }} |" >> $GITHUB_STEP_SUMMARY
