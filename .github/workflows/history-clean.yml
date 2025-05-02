@@ -51,15 +51,15 @@ on:
 
             # #
             #   Commit Label
-            #
+            #   
             #   the label to use when repository is cleaned
             # #
 
             COMMIT_LABEL:
-                description:  '🏷️ Commit Label'
-                required:     true
-                default:      'cleanup'
-                type:         string
+                description:    '🏷️ Commit Label'
+                required:       true
+                default:        'cleanup'
+                type:           string
 
             # #
             #   Main Branch
@@ -68,10 +68,10 @@ on:
             # #
 
             BRANCH_MAIN:
-                description:  '🌳 Main Branch'
-                required:     true
-                default:      'main'
-                type:         string
+                description:    '🌳 Main Branch'
+                required:       true
+                default:        'main'
+                type:           string
 
             # #
             #   Deployment Environment Name
@@ -80,22 +80,22 @@ on:
             # #
 
             DEPLOYMENT_ENV:
-                description:  '📦 Deployment Environment'
-                required:     true
-                default:      'orion'
-                type:         string
+                description:    '📦 Deployment Environment'
+                required:       true
+                default:        'orion'
+                type:           string
 
 # #
 #   environment variables
 # #
 
 env:
-    COMMIT_LABEL:         ${{ github.event.inputs.COMMIT_LABEL || 'cleanup' }}
-    BRANCH_MAIN:          ${{ github.event.inputs.BRANCH_MAIN || 'main' }}
-    DEPLOYMENT_ENV:       ${{ github.event.inputs.DEPLOYMENT_ENV || 'orion' }}
-    BOT_NAME_1:           EuropaServ
-    BOT_NAME_2:           BinaryServ
-    BOT_NAME_DEPENDABOT:  dependabot[bot]
+    COMMIT_LABEL:               ${{ github.event.inputs.COMMIT_LABEL || 'cleanup' }}
+    BRANCH_MAIN:                ${{ github.event.inputs.BRANCH_MAIN || 'main' }}
+    DEPLOYMENT_ENV:             ${{ github.event.inputs.DEPLOYMENT_ENV || 'orion' }}
+    BOT_NAME_1:                 EuropaServ
+    BOT_NAME_2:                 BinaryServ
+    BOT_NAME_DEPENDABOT:        dependabot[bot]
 
 # #
 #   jobs
@@ -103,6 +103,8 @@ env:
 
 jobs:
     history-clean:
+        name: >-
+            🧹 History › Clean
         runs-on: ubuntu-latest
       # runs-on: apollo-x64
         timeout-minutes: 5
