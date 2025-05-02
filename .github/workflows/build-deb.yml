@@ -182,7 +182,7 @@ jobs:
               id: task_tag_previous
               uses: WyriHaximus/github-action-get-previous-tag@v1
               with:
-                  fallback: 1.10.0
+                  fallback: 1.9.0
 
             # #
             #   Job > Print Current Version
