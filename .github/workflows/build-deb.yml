@@ -629,6 +629,14 @@ jobs:
                   path: ./
 
             # #
+            #   Rename opengist 386 folder to i386. for some reason, that's what they use.
+            # #
+
+            - name: "⚙️ Rename › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb"
+              run: |
+                  mv "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-386.deb" "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb"
+
+            # #
             #   Clean dist folder since we're getting the files from artifacts
             # #
 
