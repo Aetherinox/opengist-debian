@@ -141,7 +141,7 @@ jobs:
                   now=$(date -u '+%m/%d/%Y %H:%M')
                   commit_label="${{ env.COMMIT_LABEL }}" >> $GITHUB_ENV
                   echo -e "$commit_label"
-                  commit_message="\\\`️️🔒 $commit_label 🔒\\\` \\\`$now UTC\\\`" >> $GITHUB_ENV
+                  commit_message="\\\`️️🧹 $commit_label 🧹\\\` \\\`$now UTC\\\`" >> $GITHUB_ENV
                   echo -e "$commit_message"
                   echo "COMMIT_MESSAGE=$(echo $commit_message)" >> $GITHUB_ENV
                   echo "NOW=$(echo $now)" >> $GITHUB_ENV
