@@ -96,6 +96,7 @@ env:
     BOT_NAME_1:                 EuropaServ
     BOT_NAME_2:                 BinaryServ
     BOT_NAME_DEPENDABOT:        dependabot[bot]
+    BOT_NAME_RENOVATE:          renovate[bot]
 
 # #
 #   jobs
@@ -109,6 +110,20 @@ jobs:
       # runs-on: apollo-x64
         timeout-minutes: 5
         steps:
+
+            # #
+            #   History › Clean › Set TImestamps
+            # #
+
+            - name: >-
+                  🕛 Get Timestamp
+              id: task_history_clean_set_timestamp
+              run: |
+                  echo "YEAR=$(date +'%Y')" >> $GITHUB_ENV
+                  echo "NOW=$(date +'%m-%d-%Y %H:%M:%S')" >> $GITHUB_ENV
+                  echo "NOW_SHORT=$(date +'%m-%d-%Y')" >> $GITHUB_ENV
+                  echo "NOW_LONG=$(date +'%m-%d-%Y %H:%M')" >> $GITHUB_ENV
+                  echo "NOW_DOCKER_LABEL=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
             # #
             #   History › Clean › Checkout
