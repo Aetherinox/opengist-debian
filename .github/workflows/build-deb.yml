@@ -360,12 +360,6 @@ jobs:
                   echo "$(eval ./$command | tail -n1)" >> "$GITHUB_OUTPUT"
                   echo "EOF" >> $GITHUB_OUTPUT
 
-                  # #
-                  #   old run command
-                  # #
-
-                  # eval "./$command"
-
             # #
             #   Debug > Show Version
             #
@@ -386,9 +380,9 @@ jobs:
             - name: "🗔 Debug: Tree"
               shell: bash
               run: |
-                  echo -e "------------------------------------------------------"
-                  echo -e "Current Working Directory:     $PWD"
-                  echo -e "------------------------------------------------------"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  echo -e " Current Working Directory:     $PWD"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
                   tree
 
             # #
@@ -432,21 +426,21 @@ jobs:
             - name: "⚙️ Debug › Cleanup"
               id: task_build_clean
               run: |
-                  echo -e "------------------------------------------------------"
-                  echo -e "Cleaning up folder:     src"
-                  echo -e "------------------------------------------------------"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  echo -e " Cleaning up folder:     src"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
 
                   rm -rf "src"
 
-                  echo -e "------------------------------------------------------"
-                  echo -e "Deleting .tar.gz files"
-                  echo -e "------------------------------------------------------"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  echo -e " Deleting .tar.gz files"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
 
                   find . -name "*.tar.gz" -type f -delete
 
-                  echo -e "------------------------------------------------------"
-                  echo -e "Current Working Directory:     $PWD"
-                  echo -e "------------------------------------------------------"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  echo -e " Current Working Directory:     $PWD"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
                   tree
 
             # #
@@ -476,7 +470,7 @@ jobs:
         steps:
 
             # #
-            #   Dist Releases > Checkout
+            #   Release › Checkout
             # #
 
             - name: "☑️ Checkout"
@@ -486,7 +480,7 @@ jobs:
                   fetch-depth: 0
 
             # #
-            #   Debug : View passed values
+            #   Release › View Passed Values (Debug)
             # #
 
             - name: "⚙️ Debug › Passed Values"
@@ -495,7 +489,7 @@ jobs:
                   echo "VERSION ............. ${{ env.PACKAGE_VERSION }}"
 
             # #
-            #   [ Tag ]: Pre Create
+            #   Release › Pre Create Tag
             #
             #   in order to use the changelog github action, you must pre-create the tag otherwise
             #   the changelog action will have no idea what tag you are going to be creating and
@@ -513,16 +507,16 @@ jobs:
                   gpg_passphrase: ${{ secrets.ADMINSERV_GPG_PASSPHRASE }}
 
             # #
-            #   [ Tag ]: Confirm
+            #   Release › Tags (Debug)
             # #
 
-            - name: "🔖 Tag › Confirm ${{ env.PACKAGE_VERSION }}"
+            - name: "🔖 Tag › Confirm ${{ env.PACKAGE_VERSION }} (Debug)"
               run: |
                   echo "Tag already present: ${{ env.TAG_EXISTS }}"
                   echo "Tag already present: ${{ steps.task_release_tag.outputs.tag_exists }}"
 
             # #
-            #   Contributor Images
+            #   Release › Contributor Images
             # #
 
             - name: "🥸 Contributors › Generate"
@@ -534,7 +528,7 @@ jobs:
                   avatarSize: 42
 
             # #
-            #   Generate Changelog
+            #   Release › Generate Changelog (Categorized)
             #
             #   generates a changelog from the github api. requires a PREVIOUS_TAG in order to figure
             #   out the changes made between the two versions.
@@ -572,6 +566,8 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN }}
 
             # #
+            #   Release › Generate Changelog (Uncategorized)
+            #
             #   shows only categorized commits using the commit standards
             #                type(scope): description
             #                type: description
@@ -600,7 +596,7 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.ADMINSERV_TOKEN }}
 
             # #
-            #   Fetch Changelog
+            #   Release › Fetch Changelog
             # #
 
             - name: "📝 Changelog › Print (Categorized)"
@@ -620,7 +616,7 @@ jobs:
                   echo "${{ steps.task_release_changelog_uncategorized.outputs.changelog }}"
 
             # #
-            #   artifacts > download
+            #   Release › Artifacts › Download
             # #
 
             - name: "📁 Download › Saved Artifacts"
@@ -629,7 +625,10 @@ jobs:
                   path: ./
 
             # #
+            #   Release › i386 › Re-name File
+            #
             #   Rename opengist 386 folder to i386. for some reason, that's what they use.
+            #       - opengist1.10.0-linux-i386.deb/opengist1.10.0-linux-386.deb => opengist1.10.0-linux-i386.deb/opengist1.10.0-linux-i386.deb
             # #
 
             - name: "⚙️ Rename › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb"
@@ -637,23 +636,23 @@ jobs:
                   mv "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb" "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb"
 
             # #
-            #   Clean dist folder since we're getting the files from artifacts
+            #   Release › Print Tree
             # #
 
-            - name: "⚙️ Debug › Clean Dist Folder"
+            - name: "⚙️ Debug › Tree (Debug)"
               run: |
-                  echo -e "------------------------------------------------------"
-                  echo -e "Current Working Directory:     $PWD"
-                  echo -e "------------------------------------------------------"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  echo -e " Current Working Directory:     $PWD"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
                   tree
 
             # #
-            #   [ Release ]: Post Release
+            #   Release › Post New Release (Stable)
             #
             #   outputs:
-            #     [RELEASE ID]:
-            #       ${{ steps.task_release_bundle_rc.outputs.id
-            #       ${{ steps.task_release_bundle_st.outputs.id
+            #       [RELEASE ID]:
+            #           ${{ steps.task_release_bundle_rc.outputs.id
+            #           ${{ steps.task_release_bundle_st.outputs.id
             # #
 
             - name: "🏳️ Post › Stable"
@@ -679,6 +678,15 @@ jobs:
                   body: |
                       ${{ steps.task_release_changelog_categorized.outputs.changelog }}
                       ${{ steps.task_release_changelog_uncategorized.outputs.changelog }}
+
+            # #
+            #   Release › Post New Release (Release Candidate)
+            #
+            #   outputs:
+            #       [RELEASE ID]:
+            #           ${{ steps.task_release_bundle_rc.outputs.id
+            #           ${{ steps.task_release_bundle_st.outputs.id
+            # #
 
             - name: "🏳️ Post › Release Candidate"
               id: task_release_bundle_rc
@@ -708,10 +716,10 @@ jobs:
                       ${{ steps.task_release_changelog_uncategorized.outputs.changelog }}
 
             # #
-            #   Print Status
+            #   Release › Print Status
             # #
 
-            - name: "🎛️ Status › Print"
+            - name: "🎛️ Status › Print (Debug)"
               id: task_release_status_print
               run: |
                   echo "Printing Variables"
@@ -745,27 +753,38 @@ jobs:
         steps:
 
             # #
-            #   artifacts > download
+            #   Release › Complete › Artifacts › Download
             # #
 
             - name: "📁 Download › Saved Artifacts"
               uses: actions/download-artifact@v4
 
             # #
-            #   Job > Complete > Get publish timestamp
+            #   Release › Complete › Rename i386
+            #
+            #   Rename opengist 386 folder to i386. for some reason, that's what they use.
+            #       - opengist1.10.0-linux-i386.deb/opengist1.10.0-linux-386.deb => opengist1.10.0-linux-i386.deb/opengist1.10.0-linux-i386.deb
             # #
 
-            - name: "🕛 Get Timestamp"
+            - name: "⚙️ Rename › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb"
+              run: |
+                  mv "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb" "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb"
+
+            # #
+            #   Release › Complete › List Tree
+            # #
+
+            - name: "🕛 List Tree (Debug)"
               id: task_complete_timestamp_get
               run: |
                   echo "NOW=$(date +'%m-%d-%Y %H:%M:%S')" >> $GITHUB_ENV
-                  echo -e "------------------------------------------------------"
-                  echo -e "Current Working Directory:     $PWD"
-                  echo -e "------------------------------------------------------"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  echo -e " Current Working Directory:     $PWD"
+                  echo -e "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――"
                   tree
 
             # #
-            #   Job > Complete > Set ENVs
+            #   Release › Complete › Set Environment Variables
             # #
 
             - name: "🕛 Get Env Vars"
@@ -790,7 +809,7 @@ jobs:
                   echo "SHA_DEB_ARM=${deb_arm_sha256}" >> $GITHUB_ENV
 
             # #
-            #   Job > Complete > Summary of publish
+            #   Release › Complete › Public Summary
             # #
 
             - name: "🆗 Completed: ${{ env.NOW }}"
@@ -798,8 +817,8 @@ jobs:
               run: |
                   echo ""
                   echo ""
-                  echo "| File                            | SHA256                  |" >> $GITHUB_STEP_SUMMARY
-                  echo "| ------------------------------- | ----------------------- |" >> $GITHUB_STEP_SUMMARY
-                  echo "| **${{ env.FILE_DEB_386 }}**       | ${{ env.SHA_DEB_386 }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| **${{ env.FILE_DEB_AMD }}**       | ${{ env.SHA_DEB_AMD }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| **${{ env.FILE_DEB_ARM }}**       | ${{ env.SHA_DEB_ARM }} |" >> $GITHUB_STEP_SUMMARY
+                  echo "| File                              | SHA256                  |" >> $GITHUB_STEP_SUMMARY
+                  echo "| --------------------------------- | ----------------------- |" >> $GITHUB_STEP_SUMMARY
+                  echo "| **${{ env.FILE_DEB_386 }}**       | ${{ env.SHA_DEB_386 }}  |" >> $GITHUB_STEP_SUMMARY
+                  echo "| **${{ env.FILE_DEB_AMD }}**       | ${{ env.SHA_DEB_AMD }}  |" >> $GITHUB_STEP_SUMMARY
+                  echo "| **${{ env.FILE_DEB_ARM }}**       | ${{ env.SHA_DEB_ARM }}  |" >> $GITHUB_STEP_SUMMARY
