@@ -633,7 +633,9 @@ jobs:
 
             - name: "⚙️ Rename › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb"
               run: |
-                  mv "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb" "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb"
+                  if [ -f "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb" ]; then
+                      mv "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb" "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb"
+                  fi
 
             # #
             #   Release › Print Tree
@@ -768,7 +770,9 @@ jobs:
 
             - name: "⚙️ Rename › ${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ steps.task_build_deb.outputs.PACKAGE_VERSION }}-linux-i386.deb"
               run: |
-                  mv "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb" "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb"
+                  if [ -f "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb" ]; then
+                      mv "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-386.deb" "${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb/${{ inputs.PLUGIN_NAME || env.PLUGIN_NAME }}${{ env.PACKAGE_VERSION }}-linux-i386.deb"
+                  fi
 
             # #
             #   Release › Complete › List Tree
