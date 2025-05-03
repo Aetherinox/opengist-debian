@@ -1,0 +1,98 @@
+#!/bin/sh
+set -e
+
+# #
+#   @author             Aetherinox
+#   @script             Opengist .deb Package
+#   @when               05/03/2025 07:32 UTC
+#   @url                https://github.com/Aetherinox/opengist-debian
+#
+# #
+
+# #
+#   install desktop shortcut
+# #
+
+for user in /home/*
+do
+    username=${user##*/}
+    path_desktop=${user}//Desktop
+
+    if [ -d "$path_desktop" ]; then
+        cp /usr/share/applications/opengist.desktop $path_desktop
+        chgrp ${username} $path_desktop/opengist.desktop
+        chown ${username} $path_desktop/opengist.desktop
+        chmod 755 $path_desktop/opengist.desktop
+        chmod a+x $path_desktop/opengist.desktop
+    fi
+done
+
+# #
+#   color chart
+# #
+
+declare -A c=(
+    [bold]=$'\e[1m'
+    [end]=$'\e[0m'
+    [green]=$'\e[38;5;2m'
+    [yellow]=$'\e[38;5;184m'
+    [blue]=$'\e[38;5;033m'
+    [magenta]=$'\e[38;5;5m'
+    [grey1]=$'\e[38;5;240m'
+    [grey2]=$'\e[38;5;244m'
+    [grey3]=$'\e[38;5;250m'
+    [fuchsia1]=$'\e[38;5;205m'
+    [fuchsia2]=$'\e[38;5;198m'
+)
+
+# #
+#   default vars
+# #
+
+OGIST_USER="opengist"
+OGIST_HOME="/var/lib/opengist"
+OGIST_SERV="/etc/systemd/system/opengist.service"
+OGIST_CONF="/etc/opengist/config.yml"
+
+# #
+#   add opengist user/group - will gracefully abort if the user already exists.
+#   homedir not created
+#
+#   If the homedir does not already exist, create it with proper
+#   ownership and permissions.
+# #
+
+if [ "$1" = "configure" ]; then
+
+	set +e
+	adduser --system --home "${OGIST_HOME}" --no-create-home --group "${OGIST_USER}" 2>/dev/null
+	set -e
+
+	if [ ! -d "${OGIST_HOME}" ]; then
+		mkdir -m 0750 -p "${OGIST_HOME}"
+		chown "${OGIST_USER}:${OGIST_USER}" "${OGIST_HOME}"
+	fi
+fi
+
+echo "Starting service"
+
+if [ -d /run/systemd/system ]; then
+	systemctl daemon-reload >/dev/null || true
+	sleep 5
+
+	if deb-systemd-invoke is-active opengist.service; then
+		deb-systemd-invoke reload opengist.service
+	else
+		deb-systemd-helper enable opengist.service
+		deb-systemd-invoke start opengist.service
+	fi
+fi
+
+printf '\n%-35s\n\n' "  ${c[bold]}${c[grey2]}OpenGist Installer${c[end]}"
+printf '%-35s\n' "  ${c[bold]}${c[end]}Opengist has been installed. View the paths below to see where you can${c[end]}"
+printf '%-35s\n\n' "  ${c[bold]}${c[end]}find certain files for configuring Opengist.${c[end]}"
+printf '%-38s %-40s\n' "  ${c[end]}Database Location${c[end]}" "${c[bold]}${c[yellow]}${OGIST_HOME}${c[end]}"
+printf '%-38s %-40s\n' "  ${c[end]}Config Location${c[end]}" "${c[bold]}${c[yellow]}${OGIST_CONF}${c[end]}"
+printf '%-38s %-40s\n\n' "  ${c[end]}Service Location${c[end]}" "${c[bold]}${c[yellow]}${OGIST_SERV}${c[end]}"
+printf '%-35s\n' "  ${c[end]}The ${c[bold]}${c[yellow]}opengist.service${c[end]} will be ran as user ${c[bold]}${c[yellow]}${OGIST_USER}${c[end]}."
+printf '%-35s\n\n\n' "  ${c[end]}To change the user, edit the service file and modify ${c[bold]}${c[magenta]}USER=$OGIST_USER${c[end]}"
