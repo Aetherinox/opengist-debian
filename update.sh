@@ -694,6 +694,12 @@ lst_arch=(
             # #
 
             pkgArch=${lst_arch[$j]}
+            pkgArchLabel=${pkgArch}
+
+            if [ "${pkgArch}" = "386" ]; then
+                pkgArchLabel="i386"
+                printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Detected Architecture ${pkgArch}; renaming to ${c[yellow]}${pkgArchLabel}${c[end]}"
+            fi
 
             printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Processing architecture ${c[yellow]}${pkgArch}${c[end]}"
 
@@ -720,7 +726,7 @@ lst_arch=(
             pkgVersion=($( echo "${pkgArchive}" | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/' ) )
 
             if [ -f "${app_dir_this_dir}/${pkgArchive}" ]; then
-                printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Successfully downloaded archive to ${c[green]}${app_dir_this_dir}/${pkgArchive}${c[end]}${c[end]}"
+                printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Successfully downloaded archive to ${c[green]}${app_dir_this_dir}/${pkgArchive}${c[end]}"
             else
                 printf '%-29s %-65s\n' "  ${c[red2]}ERROR${c[end]}" "${c[end]}Failed to download archive file ${c[red2]}${pkgArchive}${c[end]} to ${c[red2]}${app_dir_this_dir}/${pkgArchive}${c[end]}; aborting run${c[end]}"
                 if [ "${argPrecheck}" = true ]; then
@@ -995,7 +1001,7 @@ Package: opengist
 Version: ${pkgVersion}
 Section: utils
 Priority: optional
-Architecture: ${pkgArch}
+Architecture: ${pkgArchLabel}
 Maintainer: Thomas Miceli <thomiceli@github.com>
 Depends: adduser
 Homepage: https://github.com/Aetherinox/opengist-debian
@@ -1283,7 +1289,7 @@ EOF
                     # #
 
                     gunzip "${app_dir_usr_share}/share/doc/opengist/changelog.gz" >> /dev/null 2>&1
-                    echo -e "  ${c[end]}Changelog > Unzip        ${c[green]}${app_dir_usr_share}/share/doc/opengist/changelog${c[end]}"
+                    printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Unzipping ${c[yellow]}\"${app_dir_usr_share}/share/doc/opengist/changelog.gz\"${c[end]}"
 
                     # #
                     #   changelog > AMD64 > append to top of file
@@ -1302,14 +1308,24 @@ ${CHANGELOG}
 wq
 END_ED
 
-                    echo -e "  ${c[end]}Changelog > Change       ${c[green]}${app_dir_usr_share}/share/doc/opengist/changelog${c[end]}"
+                    if [ -f "${app_dir_usr_share}/share/doc/opengist/changelog" ]; then
+                        printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Generated opengist changelog file at ${c[green]}\"${app_dir_usr_share}/share/doc/opengist/changelog\"${c[end]}"
+                    else
+                        printf '%-29s %-65s\n' "  ${c[red2]}ERROR${c[end]}" "${c[end]}Failed to generate opengist changelog file ${c[red2]}\"${app_dir_usr_share}/share/doc/opengist/changelog\"${c[end]} which does not exist; aborting${c[end]}"
+                        exit 1
+                    fi
 
                     # #
                     #   changelog > compress
                     # #
 
                     gzip --best -n "${app_dir_usr_share}/share/doc/opengist/changelog"
-                    echo -e "  ${c[end]}Changelog > Zip          ${c[green]}${app_dir_usr_share}/share/doc/opengist/changelog${c[end]}"
+                    if [ -f "${app_dir_usr_share}/share/doc/opengist/changelog.gz" ]; then
+                        printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Generated opengist compressed changelog file at ${c[green]}\"${app_dir_usr_share}/share/doc/opengist/changelog.gz\"${c[end]}"
+                    else
+                        printf '%-29s %-65s\n' "  ${c[red2]}ERROR${c[end]}" "${c[end]}Failed to generate opengist compressed changelog file ${c[red2]}\"${app_dir_usr_share}/share/doc/opengist/changelog.gz\"${c[end]} which does not exist; aborting${c[end]}"
+                        exit 1
+                    fi
             fi
 
             # #
@@ -1317,27 +1333,56 @@ END_ED
             # #
 
             sudo chmod 0775 "src/${pkgFolder}/DEBIAN/postinst"
-            echo -e "  ${c[end]}CHMOD 0775:              ${c[yellow]}src/${pkgFolder}/DEBIAN/postinst${c[end]}"
+            printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Chmod 0755 ${c[yellow]}\"src/${pkgFolder}/DEBIAN/postinst\"${c[end]}"
 
             # #
             #   create .deb package
             # #
 
-            echo -e "  ${c[end]}Create .Deb:             ${c[yellow]}src/${pkgFolder}.deb${c[end]}"
-            dpkg-deb --root-owner-group --build src/${pkgFolder}
+            printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Creating .deb file ${c[yellow]}\"src/${pkgFolder}\"${c[end]}"
+            dpkg-deb --root-owner-group --build "src/${pkgFolder}" >> /dev/null 2>&1
+
+            if [ -f "src/${pkgFolder}.deb" ]; then
+                printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Successfully created .deb file ${c[green]}\"src/${pkgFolder}.deb\"${c[end]}"
+            else
+                printf '%-29s %-65s\n' "  ${c[red2]}ERROR${c[end]}" "${c[end]}Failed to create opengist .deb file ${c[red2]}\"src/${pkgFolder}.deb\"${c[end]} which does not exist; aborting${c[end]}"
+                exit 1
+            fi
 
             # #
             #   run lintian
             # #
 
-            echo -e "  ${c[end]}Lintian:                 ${c[green]}${pkgFolder}${c[end]}"
+            printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Running lintian on folder ${c[yellow]}\"src/${pkgFolder}\"${c[end]}"
             lintian src/${pkgFolder}.deb --tag-display-limit 0 | grep executable-not-elf
 
-            echo -e
+            printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Cleaning up ${c[yellow]}build/${c[end]} folder${c[end]}"
 
             rm -rf "build" >> /dev/null 2>&1
+            rm *.tar.gz* >> /dev/null 2>&1
 
-            echo -e "  ${c[end]}Updating from ${pkgVerCurrent} to ${c[green]}${pkgVersion}${c[end]}"
+            if [ -d "src/${pkgFolder}/" ]; then
+                rm -rf "src/${pkgFolder}/"
+                if ! [ -d "src/${pkgFolder}/" ]; then
+                    printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Cleaned up folder ${c[green]}src/${pkgFolder}/${c[end]}"
+                else
+                    printf '%-29s %-65s\n' "  ${c[red2]}ERROR${c[end]}" "${c[end]}Failed to clean up folder ${c[red2]}src/${pkgFolder}/${c[end]}"
+                fi
+            fi
+
+            printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Updating packages from ${c[yellow]}${pkgVerCurrent}${c[end]} to ${c[yellow]}${pkgVersion}${c[end]}"
+
+            if [ "$pkgArchLabel" != "$pkgArch" ]; then
+                # file is ok
+                if grep -q i386 "src/${pkgFolder}.deb"; then
+                    printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "File ${c[yellow]}src/${pkgFolder}.deb${c[end]} already contains substring ${c[yellow]}${pkgArchLabel}${c[end]}"
+                else
+                    # file needs re-named
+                    pkgFolderNew="${pkgFolder/-386/-i386}"
+                    mv "src/${pkgFolder}.deb" "src/${pkgFolderNew}.deb"
+                    printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Renamed ${c[green]}src/${pkgFolder}.deb${c[end]} to ${c[green]}src/${pkgFolderNew}.deb${c[end]}"
+                fi
+            fi
 
             # #
             #   The last line but be just the version number, this is used in the Github workflow
