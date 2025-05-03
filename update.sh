@@ -1376,7 +1376,7 @@ END_ED
             rm *.tar.gz* >> /dev/null 2>&1
 
             if [ -d "src/${pkgFolder}/" ]; then
-                # rm -rf "src/${pkgFolder}/"
+                rm -rf "src/${pkgFolder}/"
                 if ! [ -d "src/${pkgFolder}/" ]; then
                     printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Cleaned up folder ${c[green]}src/${pkgFolder}/${c[end]}"
                 else
