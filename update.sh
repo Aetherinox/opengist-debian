@@ -153,6 +153,7 @@ app_dir_bin="${HOME}/bin"                                                       
 # #
 
 date_now=$(date -u '+%a, %d %b %Y %H:%M:%S')
+date_stamp=$(date -u '+%m/%d/%Y %H:%M')
 
 # #
 #   define > system
@@ -1026,10 +1027,10 @@ tee "${app_dir_debian}/postinst" << 'EOF' > /dev/null
 set -e
 
 # #
-#   @author :           aetherinox
-#   @script :           Opengist .deb Package
-#   @when   :           2025-08-02 02:14:53
-#   @url    :           https://github.com/Aetherinox/opengist-debian
+#   @author             !TEMPLATE_REPO_AUTHOR!
+#   @script             Opengist .deb Package
+#   @when               !TEMPLATE_DATE!
+#   @url                !TEMPLATE_REPO_URL!
 #
 # #
 
@@ -1078,21 +1079,19 @@ OGIST_HOME="/var/lib/opengist"
 OGIST_SERV="/etc/systemd/system/opengist.service"
 OGIST_CONF="/etc/opengist/config.yml"
 
-if [ "$1" = "configure" ]; then
+# #
+#   add opengist user/group - will gracefully abort if the user already exists.
+#   homedir not created
+#
+#   If the homedir does not already exist, create it with proper
+#   ownership and permissions.
+# #
 
-    # #
-	#   add opengist user/group - will gracefully abort if the user already exists.
-	#   homedir not created
-    # #
+if [ "$1" = "configure" ]; then
 
 	set +e
 	adduser --system --home "${OGIST_HOME}" --no-create-home --group "${OGIST_USER}" 2>/dev/null
 	set -e
-
-    # #
-	#   If the homedir does not already exist, create it with proper
-	#   ownership and permissions.
-    # #
 
 	if [ ! -d "${OGIST_HOME}" ]; then
 		mkdir -m 0750 -p "${OGIST_HOME}"
@@ -1127,7 +1126,22 @@ EOF
             if ! [ -f "${app_dir_debian}/postinst" ]; then
                 printf '%-29s %-65s\n' "  ${c[red2]}ERROR${c[end]}" "${c[end]}Failed to find file ${c[red2]}\"${app_dir_debian}/postinst\"${c[end]}; aborting${c[end]}"
                 exit 1
+            else
+                printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Successfully created file ${c[green]}\"${app_dir_debian}/postinst\"${c[end]}"
             fi
+
+            # #
+            #   Replace variables
+            # #
+
+            printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Replacing ${c[yellow]}\"!TEMPLATE_REPO_AUTHOR!\"${c[end]} with var ${c[yellow]}\"${app_repo_author}\"${c[end]}"
+            sed -r -i "s@\!TEMPLATE_REPO_AUTHOR\!@$app_repo_author@g" "${app_dir_debian}/postinst"
+
+            printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Replacing ${c[yellow]}\"!TEMPLATE_DATE!\"${c[end]} with var ${c[yellow]}\"${date_stamp} UTC\"${c[end]}"
+            sed -r -i "s@\!TEMPLATE_DATE\!@$date_stamp UTC@g" "${app_dir_debian}/postinst"
+
+            printf '%-29s %-65s\n' "  ${c[yellow]}STATUS${c[end]}" "Replacing ${c[yellow]}\"!TEMPLATE_REPO_URL!\"${c[end]} with var ${c[yellow]}\"${app_repo_url}\"${c[end]}"
+            sed -r -i "s@\!TEMPLATE_REPO_URL\!@$app_repo_url@g" "${app_dir_debian}/postinst"
 
             # #
             #   Copy opengist binary file
@@ -1362,7 +1376,7 @@ END_ED
             rm *.tar.gz* >> /dev/null 2>&1
 
             if [ -d "src/${pkgFolder}/" ]; then
-                rm -rf "src/${pkgFolder}/"
+                # rm -rf "src/${pkgFolder}/"
                 if ! [ -d "src/${pkgFolder}/" ]; then
                     printf '%-27s %-65s\n' "  ${c[green]}OK${c[end]}" "${c[end]}Cleaned up folder ${c[green]}src/${pkgFolder}/${c[end]}"
                 else
