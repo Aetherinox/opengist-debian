@@ -449,7 +449,7 @@ jobs:
 
             - name: "📦 Commit"
               id: task_build_commit
-              uses: stefanzweifel/git-auto-commit-action@v5
+              uses: stefanzweifel/git-auto-commit-action@v6
               with:
                   commit_message: Update opengist binary
 
