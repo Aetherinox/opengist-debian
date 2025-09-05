@@ -786,7 +786,7 @@ jobs:
             - name: >-
                   💤 Stale › Check Condition
               id: task_issues_inactive_stale
-              uses: actions/stale@v9
+              uses: actions/stale@v10
               with:
                   repo-token: ${{ secrets.ADMINSERV_TOKEN_CL || github.token }}
                   stale-issue-message: |
